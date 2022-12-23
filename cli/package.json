@@ -1,0 +1,48 @@
+{
+  "name": "prospark-create",
+  "version": "1.0.0",
+  "description": "Easily scaffold a new project with prefered technologies",
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "build": "tsc",
+    "start": "npm run clean && npm run build && node ./dist/index.js"
+  },
+  "keywords": [
+    "prospark",
+    "fullstack",
+    "react",
+    "node",
+    "nextjs",
+    "cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "5.0.1",
+    "commander": "^9.4.1",
+    "execa": "^6.1.0",
+    "figlet": "^1.5.2",
+    "fs-extra": "^10.1.0",
+    "gradient-string": "^2.0.2",
+    "inquirer": "^9.1.2",
+    "ora": "6.1.2",
+    "sort-package-json": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.5.5",
+    "@types/fs-extra": "^9.0.13",
+    "@types/gradient-string": "^1.1.2",
+    "@types/inquirer": "^9.0.2",
+    "@types/node": "^18.8.0",
+    "prettier": "^2.8.0",
+    "prettier-plugin-tailwindcss": "^0.2.0",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "type-fest": "^3.0.0",
+    "typescript": "^4.9.3"
+  },
+  "bin": {
+    "prospark-create": "node ./dist/index.js"
+  }
+}
