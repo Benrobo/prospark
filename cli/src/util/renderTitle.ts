@@ -1,4 +1,4 @@
-import { SCRIPT_TITLE } from "../config";
+import { SCRIPT_TITLE } from "../config/index.js";
 import gradient from "gradient-string";
 import figlet from "figlet";
 

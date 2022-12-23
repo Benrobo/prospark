@@ -1,4 +1,3 @@
-// import {execa} from "execa"
 import { execSync } from "child_process";
 
 
@@ -11,16 +10,16 @@ interface Output{
 
 function checkPackageVersion(packageName: string) : Output{
     
-    const cmd = `npm view ${packageName} version`
     const out = {
         error: false,
         version: null || ""
     } as Output
-
+    
     try {
+        // 2> simply resirect the stderr output to a log file present in `./logs/error.log`
+        const cmd = `npm view ${packageName} version 2> ./logs/error.log`
         const stdout = execSync(cmd);
         let version = stdout.toString();
-        // const regexp = /[0-9]/
         out["error"] = false;
         out["version"] = version.replace("\n", "");
         return (out);
