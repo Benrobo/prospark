@@ -1,13 +1,15 @@
+#!/usr/bin/env node
 import logger from "./util/logger.js";
 import checkPackageVersion from "./helper/checkPackageVersion.js";
 import renderTitle from "./util/renderTitle.js";
+import getCwd from "./util/getCwd.js";
+
 
 
 async function run(){
-    // renderTitle()
-    const res = checkPackageVersion("create-vite2")
+    console.log("")
 
-    if(res.error) return logger.error("package not installed")
+    logger.success(getCwd())
 }
 
 run()
