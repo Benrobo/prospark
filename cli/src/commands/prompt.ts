@@ -1,11 +1,11 @@
 import inquirer from "inquirer";
-import inquirerQestions from "../util/questions.js";
+import scaffoldQuestions from "../util/questions.js";
 
 
-function startPrompt(){
-    inquirer.prompt(inquirerQestions).then((answers) => {
+function initializePrompt(){
+    inquirer.prompt(scaffoldQuestions).then((answers) => {
         console.log(answers);
     });
 }
 
-export default startPrompt
+export default initializePrompt

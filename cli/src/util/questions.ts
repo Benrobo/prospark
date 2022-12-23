@@ -1,9 +1,13 @@
+
+const PROJECTNAME = "prospark-project"
+
 // questions asked by cli
-const inquirerQestions = [
+const scaffoldQuestions = [
     {
         type: 'input',
         name: 'projectName',
         message: 'Project name:',
+        default: PROJECTNAME
     },
     {
         type: 'list',
@@ -19,29 +23,19 @@ const inquirerQestions = [
         type: 'list',
         name: 'architecture',
         message: 'Select an architecture:',
-        choices: [
-            'Poly-repo',
-            'Mono-repo',
-        ],
+        choices: ['Poly-repo','Mono-repo']
     },
     {
         type: 'list',
         name: 'stack',
         message: 'Select stack:',
-        choices: [
-            'frontend',
-            'backend',
-            'fullstack',
-        ],
+        choices: ['frontend','backend','fullstack']
     },
     {
         type: 'list',
         name: 'variant',
         message: 'Select Variant:',
-        choices: [
-            'Typescript',
-            'Javascript',
-        ],
+        choices: ['Typescript','Javascript']
     },
     {
         type: 'list',
@@ -69,29 +63,29 @@ const inquirerQestions = [
     {
         type: 'list',
         name: 'backendRestWithTypescript',
-        message: 'Select backend rest:',
+        message: 'Select backend (REST):',
         choices: [
-            'Typescript: Nodejs',
-            'Typescript: Nodejs && Express',
-            'Typescript: Nestjs',
+            'Nodejs',
+            'Nodejs && Express',
+            'Nestjs',
         ],
-        when: (answers: any) => answers.stack === 'backend' && answers.variant === "Typescript",
+        when: (answers: any) => (answers.stack === 'backend' || answers.stack === "fullstack") && answers.variant === "Typescript",
     },
     {
         type: 'list',
         name: 'backendRestWithJavascript',
-        message: 'Select backend rest:',
+        message: 'Select backend (REST):',
         choices: [
-            'Typescript: Nodejs',
-            'Typescript: Nodejs && Express'
+            'Nodejs',
+            'Nodejs && Express'
         ],
-        when: (answers: any) => answers.stack === 'backend' && answers.variant === "Javascript",
+        when: (answers: any) => (answers.stack === 'backend' || answers.stack === "fullstack") && answers.variant === "Javascript",
     },
     {
         type: 'confirm',
         name: 'backendDatabase',
         message: 'Use database (y/n):',
-        when: (answers: any) => answers.stack === 'backend',
+        when: (answers: any) => (answers.stack === 'backend' || answers.stack === "fullstack"),
     },
     {
         type: 'list',
@@ -107,4 +101,4 @@ const inquirerQestions = [
 ]
 
 
-export default inquirerQestions
+export default scaffoldQuestions
