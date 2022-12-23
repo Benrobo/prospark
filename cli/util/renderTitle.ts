@@ -13,8 +13,14 @@ const poimandresTheme = {
     yellow: "#fffac2",
 };
 
+const color2 = {
+    red: "red",
+    blue: "blue",
+    cyan: "cyan"
+}
+
 function useGradinent(title: any){
-    const titleColor = Object.values(poimandresTheme)
+    const titleColor = Object.values(color2)
     const prosparkTitle = gradient(titleColor)(title);
     console.log(prosparkTitle)
 }
