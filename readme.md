@@ -1,0 +1,2 @@
+# Prospark
+A CLI app that help developers quickly and easily scaffold out their favorite technologies.an app that aims to appeal to developers who want a powerful and efficient tool for creating new projects and scaffolding out technologies.
