@@ -47,6 +47,7 @@
     "skipLibCheck": true,
     "useDefineForClassFields": true,
     "baseUrl": "./src",
+    "rootDir": "./src",
     "paths": {
       "*":["./src/*"]
     }
