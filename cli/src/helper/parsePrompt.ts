@@ -1,6 +1,6 @@
 import ProjectOptions from "../@types/project.js";
 import setupBackend from "./projectSetup/setup_backend.js";
-import setupFrontend from "./projectSetup/setup_frontend.js";
+import SetupFrontend from "./projectSetup/setup_frontend.js";
 import setupFullStack from "./projectSetup/setup_fullstack.js";
 
 /**
@@ -26,7 +26,7 @@ function parsePrompt(promptInput: ProjectOptions){
     const {stack}  = promptInput;
 
     if(stack === "frontend"){
-        return setupFrontend(promptInput);
+        return new SetupFrontend(promptInput);
     }
     if(stack === "backend"){
         return setupBackend(promptInput);

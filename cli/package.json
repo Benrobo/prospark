@@ -28,8 +28,10 @@
     "figlet": "^1.5.2",
     "fs-extra": "^10.1.0",
     "gradient-string": "^2.0.2",
+    "https": "^1.0.0",
     "inquirer": "^9.1.2",
     "ora": "6.1.2",
+    "pretty": "^2.0.0",
     "sort-package-json": "^2.0.0"
   },
   "devDependencies": {

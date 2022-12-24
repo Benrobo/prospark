@@ -1,5 +1,5 @@
 {
-  "name": "dfvfdv",
+  "name": "prospark-project",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,5 +10,6 @@
   },
   "devDependencies": {
     "vite": "^3.1.0"
-  }
+  },
+  "description": "Scaffolded using prospark"
 }

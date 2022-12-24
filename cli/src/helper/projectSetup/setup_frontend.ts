@@ -1,6 +1,12 @@
+import { CLIENT_TEMPLATE_DIR, SCRIPT_TITLE } from "../../config/index.js";
 import ProjectOptions from "../../@types/project.js";
-
-
+import path from "path";
+import fs from "fs-extra"
+import { getPackageJsonDataFromPath } from "../../helper/getPackageJson.js";
+import getCwd from "../../util/getCwd.js";
+import getPkgVersion from "../../helper/getPkgVersion.js";
+import { readFileData, updateFileContent } from "../../helper/file-manager.js";
+import pretty from "pretty"
 
 /**
  * 
@@ -17,24 +23,135 @@ import ProjectOptions from "../../@types/project.js";
 }
 */
 
-
-function setupFrontend(promptInput: ProjectOptions){
-
-    const {variant} = promptInput;
-
-    variant.toLowerCase() === "javascript" && handleJavascriptSetup(promptInput);
-    variant.toLowerCase() === "typescript" && handleTypescriptSetup(promptInput);
+enum Variant{
+    JS="javascript",
+    TS="typescript"
 }
 
-export default setupFrontend
-
-function handleJavascriptSetup(promptInput: ProjectOptions){
-    const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
+class SetupFrontend{
     
+    protected variant;
+    protected scaffoldDesc = "Scaffolded using prospark"
+    public constructor(promptInput: ProjectOptions){
+        this.variant = promptInput.variant;
+        this.variant.toLowerCase() === "javascript" && this.handleJavascriptSetup(promptInput);
+        this.variant.toLowerCase() === "typescript" && this.handleTypescriptSetup(promptInput);
+    }
+
+    public handleJavascriptSetup(promptInput: ProjectOptions){
+        console.log(promptInput)
     
+        const {frontendFramework, frontendStyling} = promptInput;
+
+        if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "tailwindcss"){
+            return this.isVanillaAndTailwind(promptInput)
+        } 
+    }
+
+    public handleTypescriptSetup(promptInput: ProjectOptions){
+        const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
+        console.log("TS SUPPORT")
+    }
+
+    // if the frontend framework choosen is vanilla and styling used is tailwindcss
+    protected isVanillaAndTailwind(promptInput: ProjectOptions){
+        const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
+        const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/vanilla/` : `/ts_support/vanilla/`
+        const vanillaDir = path.join(getCwd(),CLIENT_TEMPLATE_DIR, templatePath);
+        let pkgJsonData = getPackageJsonDataFromPath(vanillaDir+"package.json");
+        pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName
+        pkgJsonData["description"] = this.scaffoldDesc;
+        
+        // update index.html file in 'vanilla' client template
+        const htmlFilePath = path.join(getCwd(),CLIENT_TEMPLATE_DIR, `/js_support/vanilla/index.html`);
+        const newHtmlData = `
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>${projectName}</title>
+                    <script src="https://cdn.tailwindcss.com"></script>
+                </head>
+                <body>
+                    <h1 class="text-3xl font-bold underline">
+                    Vanilla + Tailwindcss
+                    </h1>
+                    <p>
+                    ${
+                        projectType.toLowerCase() === "blank" ?
+                        "Blank Project"
+                        :
+                        "Starter Project" 
+                    }
+                    </p>
+                    <div id="app"></div>
+                    <script type="module" src="/main.js"></script>
+                </body>
+            </html>
+        `;
+
+        // update html file to include tailwindcss config
+        updateFileContent(htmlFilePath, pretty(newHtmlData,{ocd: true}));
+
+        // update package.json
+        updateFileContent(vanillaDir+"package.json", JSON.stringify(pkgJsonData));
+
+                    
+    }
+
+    protected isReactAndTailwind(promptInput: ProjectOptions){
+        const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
+        const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/vanilla/` : `/ts_support/vanilla/`
+        const vanillaDir = path.join(getCwd(),CLIENT_TEMPLATE_DIR, templatePath);
+        let pkgJsonData = getPackageJsonDataFromPath(vanillaDir+"package.json");
+        pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName
+        pkgJsonData["description"] = this.scaffoldDesc;
+        // get package versions
+        // let tailwindVersion = getPkgVersion("tailwindcss"),
+        // postcss = getPkgVersion("postcss"),
+        // autoprefixer = getPkgVersion("autoprefixer")
+
+        // setup tailwindcss for vanilla js and html
+
+
+        // update dependencies
+        // pkgJsonData["devDependencies"] = {
+        //     ...pkgJsonData["devDependencies"], 
+        //     "tailwindcss" : tailwindVersion,
+        //     "postcss" : postcss,
+        //     "autoprefixer" : autoprefixer,
+        // }
+    }
+
+    protected createTailwindcssFiles(){
+        // files and file content
+        let postcssFilename = `postcss.config.js`,
+        postcssCont = `
+        module.exports = {
+            plugins: {
+              tailwindcss: {},
+              autoprefixer: {},
+            }
+        }
+        `,
+        tailwindFilename = `tailwind.config.js`,
+        tailwindCont = `
+        module.exports = {
+            content: ["./src/**/*.{html,js}"],
+            theme: {
+                extend: {},
+            },
+            plugins: [],
+        }
+        `,
+        mainCssname = `main.css`,
+        mainCssCont = `
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+        `
+    }
 }
 
-function handleTypescriptSetup(promptInput: ProjectOptions){
-    const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
-    console.log("TS SUPPORT")
-}
+export default SetupFrontend
