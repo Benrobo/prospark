@@ -1,10 +1,11 @@
 import inquirer from "inquirer";
 import scaffoldQuestions from "../util/questions.js";
+import parsePrompt from "../helper/parsePrompt.js";
 
 
 function initializePrompt(){
     inquirer.prompt(scaffoldQuestions).then((answers) => {
-        console.log(answers);
+        parsePrompt(answers)
     });
 }
 

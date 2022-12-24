@@ -54,9 +54,9 @@ const scaffoldQuestions = [
         name: 'frontendStyling',
         message: 'Select frontend styling:',
         choices: [
-            'css module (vanilla, nextjs, react, vue)',
-            'tailwindcss (vanilla, nextjs, react, vue)',
-            'styled-component (nextjs, react)',
+            'css module',
+            'tailwindcss',
+            'styled-component',
         ],
         when: (answers: any) => answers.stack === 'frontend',
     },
