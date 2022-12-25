@@ -2,6 +2,9 @@ import fs from "fs-extra"
 import logger from "../util/logger.js"
 import inquirer from "inquirer";
 import rimraf from "rimraf"
+import sleep from "../util/sleep.js";
+import showLoading from "../util/loader.js";
+
 
 function isDirectoryEmptySync(path: string) {
     try {
@@ -14,14 +17,35 @@ function isDirectoryEmptySync(path: string) {
 }
 
 function emptyDirectory(path: string, cb?: Function){
-    rimraf(path, (err) => {
+    rimraf(path, async (err) => {
         if (err) {
-          logger.error(err);
+            logger.error(err.message)
+            return;
         }
-        if (cb) {
-          cb();
-        }
+        
+        cb && cb();
     });
+}
+
+function copyNestedDirectoriesSync(src: string, dest: string){
+    const excludedDir = ["node_modules", ".vscode", "temp", "logs"]
+    try {
+        const files = fs.readdirSync(src);
+        for (const file of files) {
+          const srcPath = `${src}/${file}`;
+          const destPath = `${dest}/${file}`;
+          const stat = fs.statSync(srcPath);
+          if (stat.isDirectory()) {
+            if(excludedDir.includes(file)) continue;
+            fs.ensureDirSync(destPath);
+            copyNestedDirectoriesSync(srcPath, destPath);
+          } else {
+            fs.copySync(srcPath, destPath);
+          }
+        }
+    } catch (err) {
+        logger.error(err);
+    }
 }
 
 // create file
@@ -39,9 +63,11 @@ export function createFile(dest_path: string, fileName: string, content?: string
 }
 
 // create folder
-export function createFolder(folderName: string, dest_path: string){
+export async function createFolder(folderName: string, dest_path: string){
+    
+    const fullPath = `${dest_path}/${folderName}`
+    const LOADING = await showLoading();
     try {
-        const fullPath = `${dest_path}/${folderName}`
         if(!fs.existsSync(dest_path)){
             logger.error(`failed to create folder, dest_path (${dest_path}) path doesn't exists.`)
             return;
@@ -49,33 +75,37 @@ export function createFolder(folderName: string, dest_path: string){
         if(fs.existsSync(fullPath)){
             if(!isDirectoryEmptySync(fullPath)){
                 // ask the user if he would like to empty the content inside
-                inquirer.prompt([{
+                const ans = await inquirer.prompt([{
                     type: 'confirm',
                     name: 'wouldClear',
-                    message: 'Empty directory (y/n):'
-                }]).then(ans=>{
-                    if(ans.wouldClear){
-                        // empty directory
-                        emptyDirectory(fullPath, ()=>{
-                            logger.success("directory cleared.")
-                        })
-                    }
-                    logger.error(`project directory '${folderName}' already exists.`)
-                    return;
-                })
+                    message: 'Empty directory 1 (y/n):'
+                }])
+
+                if(ans.wouldClear){
+                    // empty directory
+                    LOADING.start("clearing directory");
+                    emptyDirectory(fullPath)
+                    await sleep(2);
+                    LOADING.stop("done clearing", null)
+                    !fs.existsSync(fullPath) && fs.mkdirSync(fullPath);
+                    return true;
+                }
+                logger.error(`project directory '${folderName}' already exists.`)
+                return false;
             }
-            // logger.error(`directory '${folderName}' already exists.`)
-            return;
         }
-        fs.mkdirSync(fullPath);
+        !fs.existsSync(fullPath) && fs.mkdirSync(fullPath);
+        return true;
     } catch (e: any) {
-        logger.error(`f/Applications/Visual Studio Code.app/Contents/Resources/app/out/vs/code/electron-sandbox/workbench/workbench.htmlailed to create folder: ${e.message}`)
+        logger.error(`failed to create folder: ${e.message}`)
+        return false;
     }
 }
 
 // copy directory
-export function copyDirectoryToDestination(from: string, to: string){
+export async function copyDirectoryToDestination(from: string, to: string){
     try {
+        const LOADING = await showLoading();
         if(!fs.existsSync(from)){
             logger.error(`directory (${from}) path doesn't exists.`)
             return;
@@ -86,21 +116,30 @@ export function copyDirectoryToDestination(from: string, to: string){
         }
 
         // check if the directory is empty.
-        if(!isDirectoryEmptySync(to)){
-            // ask the user if he would like to empty the content inside
-            inquirer.prompt([{
-                type: 'confirm',
-                name: 'wouldClear',
-                message: 'Empty directory (y/n):'
-            }]).then(ans=>{
-                console.log(ans)
-                if(ans.wouldClear){
+        // if(!isDirectoryEmptySync(to)){
+        //     // ask the user if he would like to empty the content inside
+        //     const ans = await inquirer.prompt([{
+        //         type: 'confirm',
+        //         name: 'wouldClear',
+        //         message: 'Empty directory 2 (y/n):'
+        //     }])
 
-                }
-            })
-        }
+        //     if(ans.wouldClear){
+        //         emptyDirectory(to);
+                
+        //         await sleep(1)
+        //         !fs.existsSync(to) && fs.mkdirSync(to);
+        //         copyNestedDirectoriesSync(from, to);
+        //         return true;
+        //     }
+        //     (await showLoading()).stop(null, `failed: ${to} isn't empty `)
+        //     return false;
+        // }
 
-        // fs.mkdirSync(`${dest_path}/${folderName}`);
+        LOADING.start("setting template");
+        copyNestedDirectoriesSync(from, to);
+        await sleep(2)
+        LOADING.stop("done setting template", null);
     } catch (e: any) {
         logger.error(`failed to copy directory: ${e.message}`)
     }
