@@ -5,8 +5,9 @@ import fs from "fs-extra"
 import { getPackageJsonDataFromPath } from "../../helper/getPackageJson.js";
 import getCwd from "../../util/getCwd.js";
 import getPkgVersion from "../../helper/getPkgVersion.js";
-import { readFileData, updateFileContent } from "../../helper/file-manager.js";
+import { createFolder, readFileData, updateFileContent } from "../../helper/file-manager.js";
 import pretty from "pretty"
+import cleanUpProjectName from "../../util/cleanProjectName.js";
 
 /**
  * 
@@ -57,7 +58,29 @@ class SetupFrontend{
     protected isVanillaAndTailwind(promptInput: ProjectOptions){
         const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
         const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/vanilla/` : `/ts_support/vanilla/`
-        const vanillaDir = path.join(getCwd(),CLIENT_TEMPLATE_DIR, templatePath);
+        const vanillaDir = path.join("./",CLIENT_TEMPLATE_DIR, templatePath);
+        const cleanProjectName = cleanUpProjectName(projectName)
+
+        // create project directory from project name
+        const dest_path = getCwd();
+        cleanProjectName !== "." && createFolder(cleanProjectName, dest_path)
+        
+        // if clean projectname isn't found in curr dir, then we can set it up there
+        // else set it up in clean project folder.
+        const projDirPath = `${getCwd()}/${cleanProjectName}`;
+        const from = vanillaDir;
+        const to = projDirPath;
+
+        return;
+        if(fs.existsSync(projDirPath)){
+            // copy all template folder to proj dir
+            fs.copyFileSync(from, to);
+        }
+        // copy all template to curr dir
+
+        // copy template folder to cwd where this command is been initiated.
+        console.log("SETUP IN CURR DIR")
+        return;
         let pkgJsonData = getPackageJsonDataFromPath(vanillaDir+"package.json");
         pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName
         pkgJsonData["description"] = this.scaffoldDesc;
