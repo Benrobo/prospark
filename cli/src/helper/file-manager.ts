@@ -4,6 +4,7 @@ import inquirer from "inquirer";
 import rimraf from "rimraf"
 import sleep from "../util/sleep.js";
 import showLoading from "../util/loader.js";
+import chalk from "chalk";
 
 
 function isDirectoryEmptySync(path: string) {
@@ -78,7 +79,8 @@ export async function createFolder(folderName: string, dest_path: string){
                 const ans = await inquirer.prompt([{
                     type: 'confirm',
                     name: 'wouldClear',
-                    message: 'Empty directory 1 (y/n):'
+                    message: 'Empty directory (y/n):',
+                    prefix: chalk.greenBright("\n?")
                 }])
 
                 if(ans.wouldClear){

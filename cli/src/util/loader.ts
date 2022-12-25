@@ -4,14 +4,14 @@ async function showLoading() {
   let spinner: any;
   return {
     start: (message: string) => {
-      spinner = ora(message).start();
+      spinner = ora(message + "\n").start();
     },
     stop: (successMessage?: string | null, errorMessage?: string | null) => {
       if (spinner) {
         if (errorMessage) {
-          spinner.fail(errorMessage);
+          spinner.fail(errorMessage + "\n");
         } else {
-          spinner.succeed(successMessage);
+          spinner.succeed(successMessage + "\n");
         }
       }
     },

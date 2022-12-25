@@ -13,6 +13,9 @@ import logger from "../../util/logger.js";
 import showLoading from "../../util/loader.js";
 import inquirer from "inquirer";
 import installDependencies from "../../helper/installDependencies.js";
+import chalk from "chalk";
+import { VANILLA_HTML_CONTENT } from "../../data/template.js";
+import { vanillSetupMessage } from "../../const/index.js";
 
 /**
  * 
@@ -48,25 +51,14 @@ class SetupFrontend{
         const ans = await inquirer.prompt([{
             type: 'confirm',
             name: 'shouldInstall',
-            message: 'Install npm dependencies?:'
+            message: 'Install npm dependencies?:',
+            prefix: chalk.greenBright("\n?")
         }])
 
         return ans.shouldInstall;
     }
 
-    protected async installPkgDependencies(devDep: string[], dep: string[]){
-        if(devDep.length > 0 ){
-            await installDependencies(devDep, true)
-        };
-        if(dep.length > 0 ){
-            await installDependencies(dep, false)
-        };
-        devDep.length === 0 && dep.length === 0 && logger.info("no dependencies to install")
-    }
-
     public handleJavascriptSetup(promptInput: ProjectOptions){
-        console.log(promptInput)
-    
         const {frontendFramework, frontendStyling} = promptInput;
 
         if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "tailwindcss"){
@@ -110,51 +102,50 @@ class SetupFrontend{
             
             // update index.html file in 'vanilla' client template
             const htmlFilePath = path.join(to, `/index.html`);
-            const newHtmlData = `
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <meta charset="UTF-8" />
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                        <title>${projectName}</title>
-                        <script src="https://cdn.tailwindcss.com"></script>
-                    </head>
-                    <body>
-                        <h1 class="text-3xl font-bold underline">
-                        Vanilla + Tailwindcss
-                        </h1>
-                        <p>
-                        ${
-                            projectType.toLowerCase() === "blank" ?
-                            "Blank Project"
-                            :
-                            "Starter Project" 
-                        }
-                        </p>
-                        <div id="app"></div>
-                        <script type="module" src="/main.js"></script>
-                    </body>
-                </html>
-            `;
+            const newHtmlData = VANILLA_HTML_CONTENT
+                .replace("{{projectName}}", projectName)
+                .replace("{{script_logic}}", `${
+                    projectType.toLowerCase() === "blank" ?
+                    "Blank Project"
+                    :
+                    "Starter Project" 
+                }`)
 
             Loading.start("updating project content...")
             // update html file to include tailwindcss config
             updateFileContent(htmlFilePath, pretty(newHtmlData,{ocd: true}));
             // update package.json
-            updateFileContent(to+"/package.json", JSON.stringify(pkgJsonData));
+            updateFileContent(to+"/package.json", JSON.stringify(pkgJsonData, null, 2));
             await sleep(2)
             Loading.stop(`done updating content..`, null);
 
             // ask for packages to be installed
             const shouldInstall = await this.askDependenciesInstalled();
+            let hasInstalled = false;
+
             if(shouldInstall){
                 const devDep = Object.keys(pkgJsonData["devDependencies"]);
-                const dep = Object.keys(pkgJsonData["devDependencies"]);
-                this.installPkgDependencies(devDep, dep);
+                // start installation
+                await installDependencies(to, true, devDep);
+                hasInstalled = true;
             }
 
-        } catch (e) {
-            
+            // show welcome message
+            console.log(chalk.cyanBright(
+                hasInstalled ? 
+                vanillSetupMessage
+                .replace("{{to}}", to)
+                .replace("{{projectName}}", projectName)
+                .replace("{{command}}", "npm run dev")
+                :
+                vanillSetupMessage
+                .replace("{{to}}", to)
+                .replace("{{projectName}}", projectName)
+                .replace("{{command}}", `npm install\nnpm run dev`)
+            ))
+
+        } catch (e: any) {
+            logger.error(e)
         }
     }
 
