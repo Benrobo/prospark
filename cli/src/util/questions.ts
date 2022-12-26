@@ -63,8 +63,7 @@ const scaffoldQuestions = [
         prefix: chalk.greenBright("\n?"),
         choices: [
             'css module',
-            'tailwindcss',
-            'styled-component',
+            'tailwindcss'
         ],
         when: (answers: any) => answers.stack === 'frontend'
     },
