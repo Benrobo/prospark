@@ -75,7 +75,6 @@ export async function createFolder(folderName: string, dest_path: string){
         }
         if(fs.existsSync(fullPath)){
             if(!isDirectoryEmptySync(fullPath)){
-                console.log("")
                 logger.warn(`${folderName} isn't empty.`)
                 // ask the user if he would like to empty the content inside
                 const ans = await inquirer.prompt([{

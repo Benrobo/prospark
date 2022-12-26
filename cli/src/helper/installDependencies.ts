@@ -11,7 +11,7 @@ async function installDependencies(path: string,  devMode: boolean, dependecies?
         const cmd = [ devMode ? `install -D ${pkgs}` : `install ${pkgs}` ]
         Loading.start("Installing dependencies...")
         await execa("npm", cmd, { cwd: path, shell: true })
-        Loading.stop("Successfully installed dependencies!\n", )
+        Loading.stop("Successfully installed dependencies!", )
     } catch (e: any) {
         logger.error(e.message)
     }

@@ -84,6 +84,19 @@ class SetupFrontend{
             createFile(styleDir, styleFile, styleContent);
             Loader.stop("css module setuped successfully.", null);
         }
+        if(frontendFramework?.toLowerCase() === "vanilla" && variant.toLowerCase() === "typescript"){
+            const styleDir = `${dest_path}/src/styles`;
+            const styleFile = `main.css`;
+            const styleContent = VANILLA_CSS_CONTENT;
+
+            Loader.start("setting up css module...")
+            // console.log(dest_path+"/src")
+            // create directory
+            await createFolder("styles", dest_path+"/src");
+            // setup css module file
+            createFile(styleDir, styleFile, styleContent);
+            Loader.stop("css module setuped successfully.", null);
+        }
     }
 
     public handleJavascriptSetup(promptInput: ProjectOptions){
@@ -115,7 +128,6 @@ class SetupFrontend{
         const vanillaDir = path.join("./",CLIENT_TEMPLATE_DIR, templatePath);
         const cleanProjectName = cleanUpProjectName(projectName)
 
-        // create project directory from project name
         const dest_path = getCwd();
 
         if(cleanProjectName !== "."){
@@ -123,12 +135,9 @@ class SetupFrontend{
         }
         
         try {
-            // if clean projectname isn't found in curr dir, then we can set it up there
-            // else set it up in clean project folder.
             const projDirPath = `${getCwd()}/${cleanProjectName}`;
             const from = vanillaDir;
             const to = projDirPath;
-            const Loading = await showLoading()
             
             // copy template folder to cwd where this command is been initiated.
             await copyDirectoryToDestination(from, to);
@@ -138,17 +147,28 @@ class SetupFrontend{
             pkgJsonData["description"] = this.scaffoldDesc;
             
             // update index.html file in 'vanilla' client template
-            const htmlFilePath = path.join(to, `/index.html`);
+            const htmlFilePath = variant.toLowerCase() === "typescript" ? path.join(to, `/index.html`) : path.join(to, `/index.html`)
+            const scriptPath = variant.toLowerCase() === "typescript" ? "./src/main.ts" : "./main.js";
             const newHtmlData = VANILLA_HTML_CONTENT
-            .replace("{{projectName}}", projectName)
-            .replace("{{script_logic}}", `${
-                projectType.toLowerCase() === "blank" ?
-                "Blank Project"
-                :
-                "Starter Project" 
-            }`)
-            .replace("{{styling_logic}}", `<script src="https://cdn.tailwindcss.com" defer></script>`)
-            .replace("{{vanilla_markup_content}}", `<h1 class="text-3xl font-bold font-sans text-blue-200 ">Vanilla + Tailwindcss</h1>`)
+                .replace("{{projectName}}", projectName)
+                .replace("{{script_logic}}", `${
+                    projectType.toLowerCase() === "blank" ?
+                    "Blank Project"
+                    :
+                    "Starter Project" 
+                }`)
+                .replace("{{styling_logic}}", `<script src="https://cdn.tailwindcss.com" defer></script>`)
+                .replace("{{script_tag}}", `<script type="module" src="${scriptPath}"></script>`)
+                .replace(
+                    "{{vanilla_markup_content}}", 
+                    `
+                    <div class="w-full h-[100vh] bg-[#123468] text-[#fff] flex flex-col items-center justify-center text-center">
+                        <h3 class="text-white-200 text-[25px] font-extrabold">Vanilla(${variant}) + Tailwindcss</h3>
+                        <br />
+                        <button id="counter" class="px-3 py-2 rounded-md bg-blue-400 text-white-100" type="button">Counter</button>
+                    </div>
+                    `
+                )
 
             // update html file to include tailwindcss config
             await updateFileContent(htmlFilePath, pretty(newHtmlData,{ocd: true}));
@@ -165,6 +185,13 @@ class SetupFrontend{
                 // start installation
                 await installDependencies(to, true, devDep);
                 hasInstalled = true;
+            }
+
+            // ask for git initialization
+            const shouldInitializeGit = await this.askForGitInit();
+            
+            if(shouldInitializeGit){
+                await initializeGit(to);
             }
 
             // show welcome message
@@ -213,7 +240,9 @@ class SetupFrontend{
             pkgJsonData["description"] = this.scaffoldDesc;
             
             // update index.html file in 'vanilla' client template
-            const htmlFilePath = path.join(to, `/index.html`);
+            const htmlFilePath = variant.toLowerCase() === "typescript" ? path.join(to, `/index.html`) : path.join(to, `/index.html`)
+            const stylePath = variant.toLowerCase() === "typescript" ? "./src/styles/main.css" : "./styles/main.css";
+            const scriptPath = variant.toLowerCase() === "typescript" ? "./src/main.ts" : "./main.js";
             const newHtmlData = VANILLA_HTML_CONTENT
                 .replace("{{projectName}}", projectName)
                 .replace("{{script_logic}}", `${
@@ -222,8 +251,19 @@ class SetupFrontend{
                     :
                     "Starter Project" 
                 }`)
-                .replace("{{styling_logic}}", `<link rel="stylesheet" href="./styles/main.css" />`)
-                .replace("{{vanilla_markup_content}}", `<h1 class="heading">Vanilla + CssModule</h1>`)
+                .replace("{{styling_logic}}", `<link rel="stylesheet" href="${stylePath}" />`)
+                .replace("{{script_tag}}", `<script type="module" src="${scriptPath}"></script>`)
+                .replace(
+                    "{{vanilla_markup_content}}", 
+                    `
+                    <div>
+                        <h3 class="heading">Vanilla(${variant}) + CssModule</h3>
+                        <div class="card">
+                            <button id="counter" type="button">Counter</button>
+                        </div>
+                    </div>
+                    `
+                )
 
             // update html file to include tailwindcss config
             await updateFileContent(htmlFilePath, pretty(newHtmlData,{ocd: true}));
