@@ -1,7 +1,6 @@
 import { CLIENT_TEMPLATE_DIR, SCRIPT_TITLE } from "../../config/index.js";
 import ProjectOptions from "../../@types/project.js";
 import path from "path";
-import fs from "fs-extra"
 import { getPackageJsonDataFromPath } from "../../helper/getPackageJson.js";
 import getCwd from "../../util/getCwd.js";
 import getPkgVersion from "../../helper/getPkgVersion.js";
@@ -36,8 +35,6 @@ enum Variant{
     JS="javascript",
     TS="typescript"
 }
-
-// 
 
 class SetupFrontend{
     
@@ -89,8 +86,14 @@ class SetupFrontend{
     }
 
     public handleTypescriptSetup(promptInput: ProjectOptions){
-        const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
-        console.log("TS SUPPORT")
+        const {frontendFramework, frontendStyling} = promptInput;
+
+        if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "tailwindcss"){
+            return this.isVanillaAndTailwind(promptInput)
+        }
+        if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "css module"){
+            return this.isVanillaAndCssModule(promptInput)
+        }
     }
 
     // if the frontend framework choosen is vanilla and styling used is tailwindcss
@@ -185,17 +188,12 @@ class SetupFrontend{
             await createFolder(cleanProjectName, dest_path)
         }
 
-        // return console.log(promptInput)
-        
         try {
-            // if clean projectname isn't found in curr dir, then we can set it up there
-            // else set it up in clean project folder.
             const projDirPath = `${getCwd()}/${cleanProjectName}`;
             const from = vanillaDir;
             const to = projDirPath;
-            const Loading = await showLoading()
             
-            // copy template folder to cwd where this command is been initiated.
+            // copy template folder to cwd where this command is been executed.
             await copyDirectoryToDestination(from, to);
 
             let pkgJsonData = getPackageJsonDataFromPath(to+"/package.json");

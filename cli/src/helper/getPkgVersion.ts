@@ -1,9 +1,5 @@
 
 import { execSync } from "child_process";
-import https from "https"
-import logger from "../util/logger.js";
-import { fstat } from "fs";
-
 
 
 function getPkgVersion(pkg_name: string) {
