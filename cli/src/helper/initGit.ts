@@ -2,7 +2,6 @@ import { execSync } from "child_process";
 import logger from "../util/logger.js";
 import showLoading from "../util/loader.js";
 import { execa } from "execa";
-import fs from "fs-extra"
 import chalk from "chalk";
 
 
