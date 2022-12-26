@@ -15,6 +15,7 @@ import installDependencies from "../../helper/installDependencies.js";
 import chalk from "chalk";
 import { VANILLA_CSS_CONTENT, VANILLA_HTML_CONTENT } from "../../data/template.js";
 import { vanillSetupMessage } from "../../const/index.js";
+import initializeGit from "../../helper/initGit.js";
 
 /**
  * 
@@ -55,6 +56,17 @@ class SetupFrontend{
         }])
 
         return ans.shouldInstall;
+    }
+
+    public async askForGitInit(){
+        const ans = await inquirer.prompt([{
+            type: 'confirm',
+            name: 'shouldInit',
+            message: 'Initialize git reppository?:',
+            prefix: chalk.greenBright("\n?")
+        }])
+
+        return ans.shouldInit;
     }
 
     public async setupCssModule(promptInput: ProjectOptions, dest_path: string){
@@ -224,12 +236,19 @@ class SetupFrontend{
             // ask for packages to be installed
             const shouldInstall = await this.askDependenciesInstalled();
             let hasInstalled = false;
-
+            
             if(shouldInstall){
                 const devDep = Object.keys(pkgJsonData["devDependencies"]);
                 // start installation
                 await installDependencies(to, true, devDep);
                 hasInstalled = true;
+            }
+            
+            // ask for git initialization
+            const shouldInitializeGit = await this.askForGitInit();
+            
+            if(shouldInitializeGit){
+                await initializeGit(to);
             }
 
             // show welcome message
