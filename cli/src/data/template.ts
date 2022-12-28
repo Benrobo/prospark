@@ -101,3 +101,37 @@ export const VANILLA_CSS_CONTENT = `
   
 
 `
+
+// React file content (Javascript support)
+export const REACT_MAIN_JSX = `
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+{{style_module}}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+`
+
+export const REACT_APP_JSX = `
+import { useState } from 'react'
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div className="App">
+      {{heading}}
+      <button onClick={() => setCount((count) => count + 1)}>
+        count is {count}
+      </button>
+      <p>{{more_info}}</p>
+    </div>
+  )
+}
+
+export default App
+`

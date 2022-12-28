@@ -312,9 +312,9 @@ class SetupFrontend{
 
     protected isReactAndTailwind(promptInput: ProjectOptions){
         const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
-        const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/vanilla/` : `/ts_support/vanilla/`
-        const vanillaDir = path.join(getCwd(),CLIENT_TEMPLATE_DIR, templatePath);
-        let pkgJsonData = getPackageJsonDataFromPath(vanillaDir+"package.json");
+        const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/react/` : `/ts_support/react/`
+        const reactDir = path.join(getCwd(),CLIENT_TEMPLATE_DIR, templatePath);
+        let pkgJsonData = getPackageJsonDataFromPath(reactDir+"package.json");
         pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName
         pkgJsonData["description"] = this.scaffoldDesc;
         // get package versions
