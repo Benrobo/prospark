@@ -148,18 +148,19 @@ export async function copyDirectoryToDestination(from: string, to: string){
     }
 }
 
-export async function updateFileContent(path_to_file: string, content?: string){
+export async function updateFileContent(path_to_file: string, content?: string, showLoader?: boolean){
     const Loading = await showLoading();
     try {
+        showLoader = showLoader === false ? false : true;
         if(!fs.existsSync(path_to_file)){
             logger.error(`failed to update file, path_to_file (${path_to_file}) path doesn't exists.`)
             return;
         }
         const file = `${path_to_file}`;
-        Loading.start("updating project content...")
+        showLoader && Loading.start("updating project content...")
         fs.writeFileSync(file, content as any);
         await sleep(1)
-        Loading.stop(`done updating content..`, null);
+        showLoader && Loading.stop(`done updating content..`, null);
     } catch (e: any) {
         logger.error(`failed to create file: ${e.message}`)
     }

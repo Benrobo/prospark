@@ -103,6 +103,9 @@ export const VANILLA_CSS_CONTENT = `
 `
 
 // React file content (Javascript support)
+
+export const REACT_INDEX_CSS = VANILLA_CSS_CONTENT;
+
 export const REACT_MAIN_JSX = `
 import React from 'react'
 import ReactDOM from 'react-dom/client'
@@ -124,14 +127,27 @@ function App() {
 
   return (
     <div className="App">
-      {{heading}}
-      <button onClick={() => setCount((count) => count + 1)}>
-        count is {count}
-      </button>
-      <p>{{more_info}}</p>
+      {{markup_content}}
     </div>
   )
 }
 
 export default App
+`
+
+export const REACT_INDEX_HTML = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}}</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="{{script_link}}"></script>
+  </body>
+</html>
+
 `

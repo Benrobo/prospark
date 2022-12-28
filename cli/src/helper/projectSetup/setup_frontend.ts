@@ -3,19 +3,18 @@ import ProjectOptions from "../../@types/project.js";
 import path from "path";
 import { getPackageJsonDataFromPath } from "../../helper/getPackageJson.js";
 import getCwd from "../../util/getCwd.js";
-import getPkgVersion from "../../helper/getPkgVersion.js";
 import { copyDirectoryToDestination, createFile, createFolder, readFileData, updateFileContent } from "../../helper/file-manager.js";
 import pretty from "pretty"
 import cleanUpProjectName from "../../util/cleanProjectName.js";
-import sleep from "../../util/sleep.js";
 import logger from "../../util/logger.js";
 import showLoading from "../../util/loader.js";
-import inquirer from "inquirer";
-import installDependencies from "../../helper/installDependencies.js";
+import { installDepInPkgJson } from "../../helper/installDependencies.js";
 import chalk from "chalk";
 import { VANILLA_CSS_CONTENT, VANILLA_HTML_CONTENT } from "../../data/template.js";
 import { vanillSetupMessage } from "../../const/index.js";
 import initializeGit from "../../helper/initGit.js";
+import ProjectBaseSetup from "./base_setup.js";
+import sleep from "../../util/sleep.js";
 
 /**
  * 
@@ -37,67 +36,55 @@ enum Variant{
     TS="typescript"
 }
 
-class SetupFrontend{
+class SetupFrontend extends ProjectBaseSetup{
     
     protected variant;
-    protected scaffoldDesc = "Scaffolded using prospark"
     public constructor(promptInput: ProjectOptions){
+        super()
         this.variant = promptInput.variant;
         this.variant.toLowerCase() === "javascript" && this.handleJavascriptSetup(promptInput);
         this.variant.toLowerCase() === "typescript" && this.handleTypescriptSetup(promptInput);
     }
 
-    public async askDependenciesInstalled(){
-        const ans = await inquirer.prompt([{
-            type: 'confirm',
-            name: 'shouldInstall',
-            message: 'Install npm dependencies?:',
-            prefix: chalk.greenBright("\n?")
-        }])
 
-        return ans.shouldInstall;
-    }
+    protected async configureReactTailwindCss(path: string){
+        const Loader = await showLoading()
+        
+        try {
+            // files and file content
+            let postcssFilename = `postcss.config.cjs`,
+            postcssCont = {
+                plugins: {
+                tailwindcss: {},
+                autoprefixer: {},
+                }
+            },
+            tailwindFilename = `tailwind.config.cjs`,
+            tailwindCont = {
+                content: ["./src/**/*.{html,js}", "./index.html"],
+                theme: {
+                    extend: {},
+                },
+                plugins: [],
+            },
+            indexCssname = `index.css`,
+            indexCssCont = `
+            @tailwind base;
+            @tailwind components;
+            @tailwind utilities;
+            `.replace(/^\s+/gm, '')
 
-    public async askForGitInit(){
-        const ans = await inquirer.prompt([{
-            type: 'confirm',
-            name: 'shouldInit',
-            message: 'Initialize git reppository?:',
-            prefix: chalk.greenBright("\n?")
-        }])
+            Loader.start("setting up tailwindcss...")
+            createFile(path, postcssFilename, `module.exports=${JSON.stringify(postcssCont, null, 2)}`);
+            createFile(path, tailwindFilename, `module.exports=${JSON.stringify(tailwindCont, null, 2)}`);
+            createFile(path+"/src", indexCssname, indexCssCont);
+            Loader.stop("tailwindcss successfully setup.", null);
 
-        return ans.shouldInit;
-    }
-
-    public async setupCssModule(promptInput: ProjectOptions, dest_path: string){
-        const {frontendFramework, variant} = promptInput;
-        const Loader = await showLoading();
-        if(frontendFramework?.toLowerCase() === "vanilla" && variant.toLowerCase() === "javascript"){
-            const styleDir = `${dest_path}/styles`;
-            const styleFile = `main.css`;
-            const styleContent = VANILLA_CSS_CONTENT;
-
-            Loader.start("setting up css module...")
-            // create directory
-            await createFolder("styles", dest_path);
-            // setup css module file
-            createFile(styleDir, styleFile, styleContent);
-            Loader.stop("css module setuped successfully.", null);
-        }
-        if(frontendFramework?.toLowerCase() === "vanilla" && variant.toLowerCase() === "typescript"){
-            const styleDir = `${dest_path}/src/styles`;
-            const styleFile = `main.css`;
-            const styleContent = VANILLA_CSS_CONTENT;
-
-            Loader.start("setting up css module...")
-            // console.log(dest_path+"/src")
-            // create directory
-            await createFolder("styles", dest_path+"/src");
-            // setup css module file
-            createFile(styleDir, styleFile, styleContent);
-            Loader.stop("css module setuped successfully.", null);
+        } catch (e: any) {
+            logger.error(e)
         }
     }
+
 
     public handleJavascriptSetup(promptInput: ProjectOptions){
         const {frontendFramework, frontendStyling} = promptInput;
@@ -176,7 +163,7 @@ class SetupFrontend{
                 )
 
             // update html file to include tailwindcss config
-            await updateFileContent(htmlFilePath, pretty(newHtmlData,{ocd: true}));
+            await updateFileContent(htmlFilePath, pretty(newHtmlData,{ocd: true}), false);
             // update package.json
             await updateFileContent(to+"/package.json", JSON.stringify(pkgJsonData, null, 2));
             
@@ -186,9 +173,7 @@ class SetupFrontend{
             let hasInstalled = false;
 
             if(shouldInstall){
-                const devDep = Object.keys(pkgJsonData["devDependencies"]);
-                // start installation
-                await installDependencies(to, true, devDep);
+                await installDepInPkgJson(to);
                 hasInstalled = true;
             }
 
@@ -271,7 +256,7 @@ class SetupFrontend{
                 )
 
             // update html file to include tailwindcss config
-            await updateFileContent(htmlFilePath, pretty(newHtmlData,{ocd: true}));
+            await updateFileContent(htmlFilePath, pretty(newHtmlData,{ocd: true}), false);
             // update package.json
             await updateFileContent(to+"/package.json", JSON.stringify(pkgJsonData, null, 2));
 
@@ -283,9 +268,8 @@ class SetupFrontend{
             let hasInstalled = false;
             
             if(shouldInstall){
-                const devDep = Object.keys(pkgJsonData["devDependencies"]);
                 // start installation
-                await installDependencies(to, true, devDep);
+                await installDepInPkgJson(to);
                 hasInstalled = true;
             }
             
@@ -319,8 +303,6 @@ class SetupFrontend{
         const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
         const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/react/` : `/ts_support/react/`
         const reactDir = path.join("./",CLIENT_TEMPLATE_DIR, templatePath);
-        const pkgJsonData = getPackageJsonDataFromPath(reactDir+"package.json");
-        const pkgJsonPath = reactDir + "package.json";
         const cleanProjectName = cleanUpProjectName(projectName)
         const dest_path = getCwd();
 
@@ -336,67 +318,38 @@ class SetupFrontend{
             
             // copy template folder to cwd where this command is been initiated.
             await copyDirectoryToDestination(from, to);
-
-            pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName
-            pkgJsonData["description"] = this.scaffoldDesc;
-            
             
             // setup tailwindcss for vanilla js and html
             await this.configureReactTailwindCss(to)
 
-            let tailwindcss = await getPkgVersion("tailwindcss"),
-            postcss = await getPkgVersion("postcss"),
-            autoprefixer = await getPkgVersion("autoprefixer")
-            
-            // update dependencies
-            pkgJsonData["devDependencies"] = {
-                ...pkgJsonData["devDependencies"], 
-                "tailwindcss" : tailwindcss,
-                "postcss" : postcss,
-                "autoprefixer" : autoprefixer,
-            }
+            // update package.json
+            const pkgJsonData : any = await this.configureReactPkgJson(newPkgJsonPath, projectName);
 
+            if(pkgJsonData === null && Object.entries(pkgJsonData).length === 0) return;
+
+            
+            // update react files
+            await this.updateFrameworkTemplateFiles(promptInput, to);
             await updateFileContent(newPkgJsonPath, JSON.stringify(pkgJsonData, null, 2));
 
+            // ask for packages to be installed
+            const shouldInstall = await this.askDependenciesInstalled();
+            let hasInstalled = false;
             
+            if(shouldInstall){
+                // start installation
+                await installDepInPkgJson(to);
+                hasInstalled = true;
+            }
 
-        } catch (e: any) {
-            logger.error(e)
-        }
-    }
+            // ask for git initialization
+            const shouldInitializeGit = await this.askForGitInit();
+            
+            if(shouldInitializeGit){
+                await initializeGit(to);
+            }
 
-    protected async configureReactTailwindCss(path: string){
-        const Loader = await showLoading()
-        
-        try {
-            // files and file content
-            let postcssFilename = `postcss.config.js`,
-            postcssCont = {
-                plugins: {
-                tailwindcss: {},
-                autoprefixer: {},
-                }
-            },
-            tailwindFilename = `tailwind.config.js`,
-            tailwindCont = {
-                content: ["./src/**/*.{html,js}"],
-                theme: {
-                    extend: {},
-                },
-                plugins: [],
-            },
-            indexCssname = `index.css`,
-            indexCssCont = `
-            @tailwind base;
-            @tailwind components;
-            @tailwind utilities;
-            `.replace(/^\s+/gm, '')
-
-            Loader.start("setting up tailwindcss...")
-            createFile(path, postcssFilename, `module.exports=${JSON.stringify(postcssCont, null, 2)}`);
-            createFile(path, tailwindFilename, `module.exports=${JSON.stringify(tailwindCont, null, 2)}`);
-            createFile(path+"/src", indexCssname, indexCssCont);
-            Loader.stop("tailwindcss successfully setup.", null);
+            this.showWelcomeMessage(vanillSetupMessage, hasInstalled, cleanProjectName, to);
 
         } catch (e: any) {
             logger.error(e)

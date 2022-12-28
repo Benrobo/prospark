@@ -18,3 +18,15 @@ async function installDependencies(path: string,  devMode: boolean, dependecies?
 }
 
 export default installDependencies
+
+
+export async function installDepInPkgJson(path: string){
+    const Loading = await showLoading()
+    try {
+        Loading.start("Installing dependencies...")
+        await execa("npm", ["install"], { cwd: path, shell: true })
+        Loading.stop("Successfully installed dependencies!", )
+    } catch (e: any) {
+        logger.error(e.message)
+    }
+}
