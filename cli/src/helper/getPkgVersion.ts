@@ -1,9 +1,16 @@
 
 import { execSync } from "child_process";
+import { execa } from "execa";
+import logger from "../util/logger.js";
 
 
-function getPkgVersion(pkg_name: string) {
-    return execSync(`npm view ${pkg_name} version`).toString().trim();
+async function getPkgVersion(pkg_name: string) {
+    try {
+        const version = await execa("npm", ["view", pkg_name, "version"]);
+        return version?.stdout.trim();
+    } catch (e: any) {
+        logger.error(e)
+    }
 }
 
 export default getPkgVersion

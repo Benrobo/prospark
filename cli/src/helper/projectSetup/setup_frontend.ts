@@ -102,11 +102,16 @@ class SetupFrontend{
     public handleJavascriptSetup(promptInput: ProjectOptions){
         const {frontendFramework, frontendStyling} = promptInput;
 
+        // Vanilla setup (.js and .ts)
         if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "tailwindcss"){
             return this.isVanillaAndTailwind(promptInput)
         }
         if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "css module"){
             return this.isVanillaAndCssModule(promptInput)
+        } 
+        // React setup (.js and .ts)
+        if(frontendFramework?.toLowerCase() === "react" && frontendStyling?.toLowerCase() === "tailwindcss"){
+            return this.isReactAndTailwind(promptInput)
         } 
     }
 
@@ -310,57 +315,92 @@ class SetupFrontend{
         }
     }
 
-    protected isReactAndTailwind(promptInput: ProjectOptions){
+    protected async isReactAndTailwind(promptInput: ProjectOptions){
         const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
         const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/react/` : `/ts_support/react/`
-        const reactDir = path.join(getCwd(),CLIENT_TEMPLATE_DIR, templatePath);
-        let pkgJsonData = getPackageJsonDataFromPath(reactDir+"package.json");
-        pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName
-        pkgJsonData["description"] = this.scaffoldDesc;
-        // get package versions
-        // let tailwindVersion = getPkgVersion("tailwindcss"),
-        // postcss = getPkgVersion("postcss"),
-        // autoprefixer = getPkgVersion("autoprefixer")
+        const reactDir = path.join("./",CLIENT_TEMPLATE_DIR, templatePath);
+        const pkgJsonData = getPackageJsonDataFromPath(reactDir+"package.json");
+        const pkgJsonPath = reactDir + "package.json";
+        const cleanProjectName = cleanUpProjectName(projectName)
+        const dest_path = getCwd();
 
-        // setup tailwindcss for vanilla js and html
+        if(cleanProjectName !== "."){
+            await createFolder(cleanProjectName, dest_path)
+        }
 
+        try {
+            const projDirPath = `${getCwd()}/${cleanProjectName}`;
+            const from = reactDir;
+            const to = projDirPath;
+            const newPkgJsonPath = `${to}/package.json`
+            
+            // copy template folder to cwd where this command is been initiated.
+            await copyDirectoryToDestination(from, to);
 
-        // update dependencies
-        // pkgJsonData["devDependencies"] = {
-        //     ...pkgJsonData["devDependencies"], 
-        //     "tailwindcss" : tailwindVersion,
-        //     "postcss" : postcss,
-        //     "autoprefixer" : autoprefixer,
-        // }
+            pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName
+            pkgJsonData["description"] = this.scaffoldDesc;
+            
+            
+            // setup tailwindcss for vanilla js and html
+            await this.configureReactTailwindCss(to)
+
+            let tailwindcss = await getPkgVersion("tailwindcss"),
+            postcss = await getPkgVersion("postcss"),
+            autoprefixer = await getPkgVersion("autoprefixer")
+            
+            // update dependencies
+            pkgJsonData["devDependencies"] = {
+                ...pkgJsonData["devDependencies"], 
+                "tailwindcss" : tailwindcss,
+                "postcss" : postcss,
+                "autoprefixer" : autoprefixer,
+            }
+
+            await updateFileContent(newPkgJsonPath, JSON.stringify(pkgJsonData, null, 2));
+
+            
+
+        } catch (e: any) {
+            logger.error(e)
+        }
     }
 
-    protected createTailwindcssFiles(){
-        // files and file content
-        let postcssFilename = `postcss.config.js`,
-        postcssCont = `
-        module.exports = {
-            plugins: {
-              tailwindcss: {},
-              autoprefixer: {},
-            }
-        }
-        `,
-        tailwindFilename = `tailwind.config.js`,
-        tailwindCont = `
-        module.exports = {
-            content: ["./src/**/*.{html,js}"],
-            theme: {
-                extend: {},
+    protected async configureReactTailwindCss(path: string){
+        const Loader = await showLoading()
+        
+        try {
+            // files and file content
+            let postcssFilename = `postcss.config.js`,
+            postcssCont = {
+                plugins: {
+                tailwindcss: {},
+                autoprefixer: {},
+                }
             },
-            plugins: [],
+            tailwindFilename = `tailwind.config.js`,
+            tailwindCont = {
+                content: ["./src/**/*.{html,js}"],
+                theme: {
+                    extend: {},
+                },
+                plugins: [],
+            },
+            indexCssname = `index.css`,
+            indexCssCont = `
+            @tailwind base;
+            @tailwind components;
+            @tailwind utilities;
+            `.replace(/^\s+/gm, '')
+
+            Loader.start("setting up tailwindcss...")
+            createFile(path, postcssFilename, `module.exports=${JSON.stringify(postcssCont, null, 2)}`);
+            createFile(path, tailwindFilename, `module.exports=${JSON.stringify(tailwindCont, null, 2)}`);
+            createFile(path+"/src", indexCssname, indexCssCont);
+            Loader.stop("tailwindcss successfully setup.", null);
+
+        } catch (e: any) {
+            logger.error(e)
         }
-        `,
-        mainCssname = `main.css`,
-        mainCssCont = `
-        @tailwind base;
-        @tailwind components;
-        @tailwind utilities;
-        `
     }
 }
 
