@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs-extra"
 import getCwd from "../util/getCwd.js";
+import logger from "../util/logger.js";
 
 
 
@@ -21,6 +22,7 @@ export function getPackageJsonDataFromPath(path: string){
         const data = fs.readJsonSync(path);
         return data;
     } catch (e) {
+        logger.error(e)
         return null;
     }
 }

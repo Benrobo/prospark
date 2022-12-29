@@ -15,6 +15,7 @@ import { vanillSetupMessage } from "../../const/index.js";
 import initializeGit from "../../helper/initGit.js";
 import ProjectBaseSetup from "./base_setup.js";
 import sleep from "../../util/sleep.js";
+import fs from "fs-extra";
 
 /**
  * 
@@ -48,6 +49,9 @@ class SetupFrontend extends ProjectBaseSetup{
 
 
     protected async configureReactTailwindCss(path: string){
+        
+        if(!fs.pathExistsSync(path)) return;
+        
         const Loader = await showLoading()
         
         try {
@@ -61,7 +65,7 @@ class SetupFrontend extends ProjectBaseSetup{
             },
             tailwindFilename = `tailwind.config.cjs`,
             tailwindCont = {
-                content: ["./src/**/*.{html,js}", "./index.html"],
+                content: [ "./index.html","./src/**/*.{html,js,jsx}"],
                 theme: {
                     extend: {},
                 },
@@ -316,33 +320,25 @@ class SetupFrontend extends ProjectBaseSetup{
             const to = projDirPath;
             const newPkgJsonPath = `${to}/package.json`
             
-            // copy template folder to cwd where this command is been initiated.
             await copyDirectoryToDestination(from, to);
             
-            // setup tailwindcss for vanilla js and html
-            await this.configureReactTailwindCss(to)
-
-            // update package.json
             const pkgJsonData : any = await this.configureReactPkgJson(newPkgJsonPath, projectName);
 
             if(pkgJsonData === null && Object.entries(pkgJsonData).length === 0) return;
-
             
-            // update react files
             await this.updateFrameworkTemplateFiles(promptInput, to);
             await updateFileContent(newPkgJsonPath, JSON.stringify(pkgJsonData, null, 2));
+            
+            await this.configureReactTailwindCss(to)
 
-            // ask for packages to be installed
             const shouldInstall = await this.askDependenciesInstalled();
             let hasInstalled = false;
             
             if(shouldInstall){
-                // start installation
                 await installDepInPkgJson(to);
                 hasInstalled = true;
             }
 
-            // ask for git initialization
             const shouldInitializeGit = await this.askForGitInit();
             
             if(shouldInitializeGit){

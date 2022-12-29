@@ -18,6 +18,12 @@ function isDirectoryEmptySync(path: string) {
 }
 
 function emptyDirectory(path: string, cb?: Function){
+    // Check if the node_modules folder exists
+    if (fs.existsSync(`${path}/node_modules`)) {
+        // Remove the node_modules folder
+        fs.removeSync(`${path}/node_modules`);
+    }
+    
     rimraf(path, async (err) => {
         if (err) {
             logger.error(err.message)
@@ -153,7 +159,7 @@ export async function updateFileContent(path_to_file: string, content?: string, 
     try {
         showLoader = showLoader === false ? false : true;
         if(!fs.existsSync(path_to_file)){
-            logger.error(`failed to update file, path_to_file (${path_to_file}) path doesn't exists.`)
+            logger.error(`something went wrong, try again: failed to update file, path_to_file (${path_to_file}) path doesn't exists.`)
             return;
         }
         const file = `${path_to_file}`;

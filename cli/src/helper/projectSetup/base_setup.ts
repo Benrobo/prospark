@@ -117,7 +117,6 @@ class ProjectBaseSetup{
 
     public async updateFrameworkTemplateFiles(promptInput: ProjectOptions, dest_path: string){
         const {frontendFramework, variant, projectType, frontendStyling} = promptInput;
-        const Loader = await showLoading();
         if(frontendFramework?.toLowerCase() === "react" && variant.toLowerCase() === "javascript"){
             try {
                 const mainDir = `${dest_path}`;
@@ -130,7 +129,7 @@ class ProjectBaseSetup{
     
                 if(frontendStyling === "tailwindcss"){
                     const AppJsx = REACT_APP_JSX
-                    .replace("{{heading}}", `
+                    .replace("{{markup_content}}", `
                     <div className="w-full h-[100vh] flex flex-col items-center justify-center bg-blue-400 text-[#fff] ">
                         <h3 className="text-white-200 text-[25px] font-extrabold">React(${variant}) + Tailwindcss</h3>
                         <br />
