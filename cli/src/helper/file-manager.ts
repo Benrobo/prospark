@@ -20,7 +20,7 @@ function isDirectoryEmptySync(path: string) {
 function emptyDirectory(path: string, cb?: Function){
     // Check if the node_modules folder exists
     if (fs.existsSync(`${path}/node_modules`)) {
-        // Remove the node_modules folder
+        // Remove the node_modules folder first
         fs.removeSync(`${path}/node_modules`);
     }
     

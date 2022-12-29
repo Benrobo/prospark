@@ -104,6 +104,9 @@ class SetupFrontend extends ProjectBaseSetup{
         if(frontendFramework?.toLowerCase() === "react" && frontendStyling?.toLowerCase() === "tailwindcss"){
             return this.isReactAndTailwind(promptInput)
         } 
+        if(frontendFramework?.toLowerCase() === "react" && frontendStyling?.toLowerCase() === "css module"){
+            return this.isReactAndCssModule(promptInput)
+        } 
     }
 
     public handleTypescriptSetup(promptInput: ProjectOptions){
@@ -322,7 +325,7 @@ class SetupFrontend extends ProjectBaseSetup{
             
             await copyDirectoryToDestination(from, to);
             
-            const pkgJsonData : any = await this.configureReactPkgJson(newPkgJsonPath, projectName);
+            const pkgJsonData : any = await this.configureReactPkgJson(newPkgJsonPath, projectName, frontendStyling as string);
 
             if(pkgJsonData === null && Object.entries(pkgJsonData).length === 0) return;
             
@@ -331,6 +334,53 @@ class SetupFrontend extends ProjectBaseSetup{
             
             await this.configureReactTailwindCss(to)
 
+            const shouldInstall = await this.askDependenciesInstalled();
+            let hasInstalled = false;
+            
+            if(shouldInstall){
+                await installDepInPkgJson(to);
+                hasInstalled = true;
+            }
+
+            const shouldInitializeGit = await this.askForGitInit();
+            
+            if(shouldInitializeGit){
+                await initializeGit(to);
+            }
+
+            this.showWelcomeMessage(vanillSetupMessage, hasInstalled, cleanProjectName, to);
+
+        } catch (e: any) {
+            logger.error(e)
+        }
+    }
+
+    protected async isReactAndCssModule(promptInput: ProjectOptions){
+        const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
+        const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/react/` : `/ts_support/react/`
+        const reactDir = path.join("./",CLIENT_TEMPLATE_DIR, templatePath);
+        const cleanProjectName = cleanUpProjectName(projectName)
+        const dest_path = getCwd();
+
+        if(cleanProjectName !== "."){
+            await createFolder(cleanProjectName, dest_path)
+        }
+
+        try {
+            const projDirPath = `${getCwd()}/${cleanProjectName}`;
+            const from = reactDir;
+            const to = projDirPath;
+            const newPkgJsonPath = `${to}/package.json`
+            
+            await copyDirectoryToDestination(from, to);
+            
+            const pkgJsonData : any = await this.configureReactPkgJson(newPkgJsonPath, projectName, frontendStyling as string);
+
+            if(pkgJsonData === null && Object.entries(pkgJsonData).length === 0) return;
+            
+            await this.updateFrameworkTemplateFiles(promptInput, to);
+            await updateFileContent(newPkgJsonPath, JSON.stringify(pkgJsonData, null, 2));
+            
             const shouldInstall = await this.askDependenciesInstalled();
             let hasInstalled = false;
             

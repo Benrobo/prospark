@@ -53,7 +53,7 @@ class ProjectBaseSetup{
     }
 
 
-    protected async configureReactPkgJson(path: string, projectName: string){
+    protected async configureReactPkgJson(path: string, projectName: string, styling: string){
         const loader = await showLoading()
         try {
             const pkgJsonData = getPackageJsonDataFromPath(path);
@@ -63,16 +63,17 @@ class ProjectBaseSetup{
             
             loader.start("updating package.json...")
 
-            let tailwindcss = await getPkgVersion("tailwindcss"),
+            if(styling === "tailwindcss"){
+                let tailwindcss = await getPkgVersion("tailwindcss"),
                 postcss = await getPkgVersion("postcss"),
                 autoprefixer = await getPkgVersion("autoprefixer")
             
-            // update dependencies
-            pkgJsonData["devDependencies"] = {
-                ...pkgJsonData["devDependencies"], 
-                "tailwindcss" : tailwindcss,
-                "postcss" : postcss,
-                "autoprefixer" : autoprefixer,
+                pkgJsonData["devDependencies"] = {
+                    ...pkgJsonData["devDependencies"], 
+                    "tailwindcss" : tailwindcss,
+                    "postcss" : postcss,
+                    "autoprefixer" : autoprefixer,
+                }
             }
 
             loader.stop("package.json updated.", null);
@@ -117,18 +118,21 @@ class ProjectBaseSetup{
 
     public async updateFrameworkTemplateFiles(promptInput: ProjectOptions, dest_path: string){
         const {frontendFramework, variant, projectType, frontendStyling} = promptInput;
+        const mainDir = `${dest_path}`;
+        const projType = projectType.toLowerCase() === "blank" ? "Blank Project" : "Starter Project"
+        const appCss = mainDir+"/src/App.css",
+        indexCss = mainDir+"/src/index.css",
+        appJsx = mainDir+"/src/App.jsx",
+        mainJsx = mainDir+'/src/main.jsx',
+        htmlFile = mainDir+"/index.html"
+
+
         if(frontendFramework?.toLowerCase() === "react" && variant.toLowerCase() === "javascript"){
             try {
-                const mainDir = `${dest_path}`;
-                const projType = projectType.toLowerCase() === "blank" ? "Blank Project" : "Starter Project"
-                const appCss = mainDir+"/src/App.css",
-                indexCss = mainDir+"/src/index.css",
-                appJsx = mainDir+"/src/App.jsx",
-                mainJsx = mainDir+'/src/main.jsx',
-                htmlFile = mainDir+"/index.html"
     
                 if(frontendStyling === "tailwindcss"){
                     const AppJsx = REACT_APP_JSX
+                    .replace("{{styling}}", '')
                     .replace("{{markup_content}}", `
                     <div className="w-full h-[100vh] flex flex-col items-center justify-center bg-blue-400 text-[#fff] ">
                         <h3 className="text-white-200 text-[25px] font-extrabold">React(${variant}) + Tailwindcss</h3>
@@ -149,8 +153,29 @@ class ProjectBaseSetup{
                     await updateFileContent(htmlFile, pretty(reactIndexHtml), false)
                 }
 
-                
-                
+                if(frontendStyling === "css module"){
+                    const AppJsx = REACT_APP_JSX
+                    .replace("{{styling}}", "import './App.css'")
+                    .replace("{{markup_content}}", `
+                    <div className="card">
+                        <h3>React(${variant}) + CssModule</h3>
+                        <br />
+                        <button onClick={() => setCount((count) => count + 1)}>
+                            count is {count}
+                        </button>
+                        <br />
+                        <p>${projType}</p>
+                    </div>
+                    `)
+
+                    const reactIndexHtml = REACT_INDEX_HTML
+                    .replace("{{title}}", "Prospark App")
+                    .replace("{{script_link}}", "./src/main.jsx")
+    
+                    await updateFileContent(appJsx, pretty(AppJsx), false)
+                    await updateFileContent(htmlFile, pretty(reactIndexHtml), false)
+                }
+
             } catch (e: any) {
                 logger.error(e)
             }

@@ -121,7 +121,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 export const REACT_APP_JSX = `
 import { useState } from 'react'
-
+{{styling}}
 function App() {
   const [count, setCount] = useState(0)
 
