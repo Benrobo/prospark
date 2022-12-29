@@ -89,42 +89,29 @@ class SetupFrontend extends ProjectBaseSetup{
         }
     }
 
+    public handleFrontendSetup(promptInput: ProjectOptions) {
+        const {frontendFramework, frontendStyling} : any = promptInput;
+      
+        switch (`${frontendFramework.toLowerCase()}-${frontendStyling.toLowerCase()}`) {
+          case "vanilla-tailwindcss":
+            return this.isVanillaAndTailwind(promptInput);
+          case "vanilla-css module":
+            return this.isVanillaAndCssModule(promptInput);
+          case "react-tailwindcss":
+            return this.isReactAndTailwind(promptInput);
+          case "react-css module":
+            return this.isReactAndCssModule(promptInput);
+          default:
+            // code to handle other cases or an error
+        }
+      }
 
     public handleJavascriptSetup(promptInput: ProjectOptions){
-        const {frontendFramework, frontendStyling} = promptInput;
-
-        // Vanilla setup (.js and .ts)
-        if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "tailwindcss"){
-            return this.isVanillaAndTailwind(promptInput)
-        }
-        if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "css module"){
-            return this.isVanillaAndCssModule(promptInput)
-        } 
-        // React setup (.js and .ts)
-        if(frontendFramework?.toLowerCase() === "react" && frontendStyling?.toLowerCase() === "tailwindcss"){
-            return this.isReactAndTailwind(promptInput)
-        } 
-        if(frontendFramework?.toLowerCase() === "react" && frontendStyling?.toLowerCase() === "css module"){
-            return this.isReactAndCssModule(promptInput)
-        } 
+        return this.handleFrontendSetup(promptInput)
     }
 
     public handleTypescriptSetup(promptInput: ProjectOptions){
-        const {frontendFramework, frontendStyling} = promptInput;
-
-        if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "tailwindcss"){
-            return this.isVanillaAndTailwind(promptInput)
-        }
-        if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "css module"){
-            return this.isVanillaAndCssModule(promptInput)
-        }
-        // React setup (.js and .ts)
-        if(frontendFramework?.toLowerCase() === "react" && frontendStyling?.toLowerCase() === "tailwindcss"){
-            return this.isReactAndTailwind(promptInput)
-        } 
-        if(frontendFramework?.toLowerCase() === "react" && frontendStyling?.toLowerCase() === "css module"){
-            return this.isReactAndCssModule(promptInput)
-        } 
+        return this.handleFrontendSetup(promptInput)
     }
 
     // if the frontend framework choosen is vanilla and styling used is tailwindcss
