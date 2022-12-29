@@ -65,7 +65,7 @@ class SetupFrontend extends ProjectBaseSetup{
             },
             tailwindFilename = `tailwind.config.cjs`,
             tailwindCont = {
-                content: [ "./index.html","./src/**/*.{html,js,jsx}"],
+                content: [ "./index.html","./src/**/*.{html,js,jsx,ts,tsx}"],
                 theme: {
                     extend: {},
                 },
@@ -118,6 +118,13 @@ class SetupFrontend extends ProjectBaseSetup{
         if(frontendFramework?.toLowerCase() === "vanilla" && frontendStyling?.toLowerCase() === "css module"){
             return this.isVanillaAndCssModule(promptInput)
         }
+        // React setup (.js and .ts)
+        if(frontendFramework?.toLowerCase() === "react" && frontendStyling?.toLowerCase() === "tailwindcss"){
+            return this.isReactAndTailwind(promptInput)
+        } 
+        if(frontendFramework?.toLowerCase() === "react" && frontendStyling?.toLowerCase() === "css module"){
+            return this.isReactAndCssModule(promptInput)
+        } 
     }
 
     // if the frontend framework choosen is vanilla and styling used is tailwindcss

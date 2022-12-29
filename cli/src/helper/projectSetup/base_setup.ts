@@ -119,15 +119,13 @@ class ProjectBaseSetup{
     public async updateFrameworkTemplateFiles(promptInput: ProjectOptions, dest_path: string){
         const {frontendFramework, variant, projectType, frontendStyling} = promptInput;
         const mainDir = `${dest_path}`;
+        const fileExt = variant.toLowerCase() === "javascript" ? "jsx" : "tsx"
         const projType = projectType.toLowerCase() === "blank" ? "Blank Project" : "Starter Project"
-        const appCss = mainDir+"/src/App.css",
-        indexCss = mainDir+"/src/index.css",
-        appJsx = mainDir+"/src/App.jsx",
-        mainJsx = mainDir+'/src/main.jsx',
-        htmlFile = mainDir+"/index.html"
+        const appJsx = mainDir+`/src/App.${fileExt}`,
+        htmlFile = mainDir+`/index.html`
 
 
-        if(frontendFramework?.toLowerCase() === "react" && variant.toLowerCase() === "javascript"){
+        if(frontendFramework?.toLowerCase() === "react"){
             try {
     
                 if(frontendStyling === "tailwindcss"){
@@ -147,7 +145,7 @@ class ProjectBaseSetup{
 
                     const reactIndexHtml = REACT_INDEX_HTML
                     .replace("{{title}}", "Prospark App")
-                    .replace("{{script_link}}", "./src/main.jsx")
+                    .replace("{{script_link}}", `./src/main.${fileExt}`)
     
                     await updateFileContent(appJsx, pretty(AppJsx), false)
                     await updateFileContent(htmlFile, pretty(reactIndexHtml), false)
@@ -155,7 +153,7 @@ class ProjectBaseSetup{
 
                 if(frontendStyling === "css module"){
                     const AppJsx = REACT_APP_JSX
-                    .replace("{{styling}}", "import './App.css'")
+                    .replace("{{styling}}", "import './App.css'\n")
                     .replace("{{markup_content}}", `
                     <div className="card">
                         <h3>React(${variant}) + CssModule</h3>
@@ -170,7 +168,7 @@ class ProjectBaseSetup{
 
                     const reactIndexHtml = REACT_INDEX_HTML
                     .replace("{{title}}", "Prospark App")
-                    .replace("{{script_link}}", "./src/main.jsx")
+                    .replace("{{script_link}}", `./src/main.${fileExt}`)
     
                     await updateFileContent(appJsx, pretty(AppJsx), false)
                     await updateFileContent(htmlFile, pretty(reactIndexHtml), false)
