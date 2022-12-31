@@ -219,14 +219,17 @@ class ProjectBaseSetup{
     
                 if(frontendStyling === "tailwindcss"){
                     const CounterSvelte = COUNTER_SVELTE
-                    .replace("{{styling}}", 'class="px-3 py-2 rounded-md text-[#fff] bg-[#535bf2]"')
+                    .replace("{{styling}}", 'class="px-3 py-2 rounded-md text-[#fff] bg-[#535bf2] mt-4 "')
                     
                     const AppSvelte = APP_SVELTE
-                    .replace("{{heading}}", `
+                    .replace("{{markup}}", `
                     <div class="w-full h-[100vh] flex flex-col items-center justify-center bg-[#242424] ">
                     <h3 class="text-[#fff] text-[25px] font-bold">Svelte(${variant}) + Tailwindcss</h3>
+                        <div class="card">
+                            <Counter />
+                        </div>
                         <br />
-                        <p class="text-[#ccc] font-bold">${projType}</p>
+                        <p class="text-[#ccc] font-medium">${projType}</p>
                     </div>
                     `)
     

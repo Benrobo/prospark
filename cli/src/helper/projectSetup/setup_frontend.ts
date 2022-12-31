@@ -117,28 +117,12 @@ class SetupFrontend extends ProjectBaseSetup{
             @tailwind base;
             @tailwind components;
             @tailwind utilities;
-            `.replace(/^\s+/gm, ''),
-            svelteConfigName = "svelte.config.js",
-            svelteConfigCont = `
-            import adapter from '@sveltejs/adapter-auto';
-            import { vitePreprocess } from '@sveltejs/kit/vite';
-
-            /** @type {import('@sveltejs/kit').Config} */
-            const config = {
-            kit: {
-                adapter: adapter()
-            },
-            preprocess: vitePreprocess()
-            };
-
-            export default config;
-            `
+            `.replace(/^\s+/gm, '')
 
             Loader.start("setting up tailwindcss...")
             createFile(path, postcssFilename, `module.exports=${JSON.stringify(postcssCont, null, 2)}`);
             createFile(path, tailwindFilename, `module.exports=${JSON.stringify(tailwindCont, null, 2)}`);
             createFile(path+"/src", appCssname, appCssCont);
-            createFile(path, svelteConfigName, pretty(svelteConfigCont));
             Loader.stop("tailwindcss successfully setup.", null);
 
         } catch (e: any) {

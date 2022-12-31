@@ -157,11 +157,7 @@ export const APP_SVELTE = `
 </script>
 
 <main>
-  {{heading}}
-
-  <div class="card">
-    <Counter />
-  </div>
+  {{markup}}
 </main>
 `
 
