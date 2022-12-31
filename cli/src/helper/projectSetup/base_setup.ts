@@ -285,14 +285,9 @@ class ProjectBaseSetup{
 
                     const AppSvelte = APP_SVELTE
                     .replace("{{markup}}", `
-                    <div class="container">
-                        <h3 class="heading">Svelte(${variant}) + Tailwindcss</h3>
-                        <div class="card">
-                            <Counter />
-                        </div>
-                        <br />
-                        <p>${projType}</p>
-                    </div>
+                    <h3 class="heading">Svelte(${variant}) + Tailwindcss</h3>
+                    <Counter />
+                    <p>${projType}</p>
                     `)
 
                     const svelteIndexHtmlCont = SVELTE_INDEX_HTML
