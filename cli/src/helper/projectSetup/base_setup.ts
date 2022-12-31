@@ -285,7 +285,7 @@ class ProjectBaseSetup{
 
                     const AppSvelte = APP_SVELTE
                     .replace("{{markup}}", `
-                    <h3 class="heading">Svelte(${variant}) + Tailwindcss</h3>
+                    <h3 class="heading">Svelte(${variant}) + CssModule</h3>
                     <Counter />
                     <p>${projType}</p>
                     `)
