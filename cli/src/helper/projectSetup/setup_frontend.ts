@@ -104,7 +104,7 @@ class SetupFrontend extends ProjectBaseSetup{
           default:
             // code to handle other cases or an error
         }
-      }
+    }
 
     public handleJavascriptSetup(promptInput: ProjectOptions){
         return this.handleFrontendSetup(promptInput)
