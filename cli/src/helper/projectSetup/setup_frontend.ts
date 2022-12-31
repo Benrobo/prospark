@@ -144,6 +144,8 @@ class SetupFrontend extends ProjectBaseSetup{
             return this.isReactAndCssModule(promptInput);
         case "svelte-tailwindcss":
             return this.isSvelteAndTailwindCss(promptInput);
+        case "svelte-css module":
+            return this.isSvelteAndCssModule(promptInput)
           default:
             // code to handle other cases or an error
         }
@@ -465,6 +467,53 @@ class SetupFrontend extends ProjectBaseSetup{
             
             await this.configureSvelteTailwindCss(to)
 
+            const shouldInstall = await this.askDependenciesInstalled();
+            let hasInstalled = false;
+            
+            if(shouldInstall){
+                await installDepInPkgJson(to);
+                hasInstalled = true;
+            }
+
+            const shouldInitializeGit = await this.askForGitInit();
+            
+            if(shouldInitializeGit){
+                await initializeGit(to);
+            }
+
+            this.showWelcomeMessage(vanillSetupMessage, hasInstalled, cleanProjectName, to);
+
+        } catch (e: any) {
+            logger.error(e)
+        }
+    }
+
+    protected async isSvelteAndCssModule(promptInput: ProjectOptions){
+        const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
+        const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/svelte/` : `/ts_support/svelte/`
+        const reactDir = path.join("./",CLIENT_TEMPLATE_DIR, templatePath);
+        const cleanProjectName = cleanUpProjectName(projectName)
+        const dest_path = getCwd();
+
+        if(cleanProjectName !== "."){
+            await createFolder(cleanProjectName, dest_path)
+        }
+
+        try {
+            const projDirPath = `${getCwd()}/${cleanProjectName}`;
+            const from = reactDir;
+            const to = projDirPath;
+            const newPkgJsonPath = `${to}/package.json`
+            
+            await copyDirectoryToDestination(from, to);
+            
+            const pkgJsonData : any = await this.configureSveltePkgJson(newPkgJsonPath, projectName, frontendStyling as string);
+
+            if(pkgJsonData === null && Object.entries(pkgJsonData).length === 0) return;
+            
+            await this.updateFrameworkTemplateFiles(promptInput, to);
+            await updateFileContent(newPkgJsonPath, JSON.stringify(pkgJsonData, null, 2));
+            
             const shouldInstall = await this.askDependenciesInstalled();
             let hasInstalled = false;
             
