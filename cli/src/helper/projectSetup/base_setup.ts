@@ -156,8 +156,8 @@ class ProjectBaseSetup{
         const projType = projectType.toLowerCase() === "blank" ? "Blank Project" : "Starter Project"
         const appJsx = mainDir+`/src/App.${fileExt}`,
         htmlFile = mainDir+`/index.html`,
-        appSvelte = mainDir+`/App.svelte`,
-        counterSvelte = mainDir+`/lib/Counter.svelte`
+        appSvelte = mainDir+`/src/App.svelte`,
+        counterSvelte = mainDir+`/src/lib/Counter.svelte`
 
 
         if(frontendFramework?.toLowerCase() === "react"){
@@ -219,13 +219,14 @@ class ProjectBaseSetup{
     
                 if(frontendStyling === "tailwindcss"){
                     const CounterSvelte = COUNTER_SVELTE
-                    .replace("{{styling}}", 'class="px-3 py-2 rounded-md bg-[#000]"')
+                    .replace("{{styling}}", 'class="px-3 py-2 rounded-md text-[#fff] bg-[#535bf2]"')
                     
                     const AppSvelte = APP_SVELTE
                     .replace("{{heading}}", `
-                    <h3 className="text-white-200 text-[25px] font-extrabold">Svelte(${variant}) + Tailwindcss</h3>
+                    <div class="w-full h-[100vh] flex flex-col items-center justify-center bg-[#242424] ">
+                    <h3 class="text-[#fff] text-[25px] font-bold">Svelte(${variant}) + Tailwindcss</h3>
                         <br />
-                        <p>${projType}</p>
+                        <p class="text-[#ccc] font-bold">${projType}</p>
                     </div>
                     `)
     

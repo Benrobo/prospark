@@ -89,6 +89,63 @@ class SetupFrontend extends ProjectBaseSetup{
         }
     }
 
+    protected async configureSvelteTailwindCss(path: string){
+        
+        if(!fs.pathExistsSync(path)) return;
+        
+        const Loader = await showLoading()
+        
+        try {
+            // files and file content
+            let postcssFilename = `postcss.config.cjs`,
+            postcssCont = {
+                plugins: {
+                tailwindcss: {},
+                autoprefixer: {},
+                }
+            },
+            tailwindFilename = `tailwind.config.cjs`,
+            tailwindCont = {
+                content: ['./src/**/*.{html,js,svelte,ts}'],
+                theme: {
+                    extend: {},
+                },
+                plugins: [],
+            },
+            appCssname = `app.css`,
+            appCssCont = `
+            @tailwind base;
+            @tailwind components;
+            @tailwind utilities;
+            `.replace(/^\s+/gm, ''),
+            svelteConfigName = "svelte.config.js",
+            svelteConfigCont = `
+            import adapter from '@sveltejs/adapter-auto';
+            import { vitePreprocess } from '@sveltejs/kit/vite';
+
+            /** @type {import('@sveltejs/kit').Config} */
+            const config = {
+            kit: {
+                adapter: adapter()
+            },
+            preprocess: vitePreprocess()
+            };
+
+            export default config;
+            `
+
+            Loader.start("setting up tailwindcss...")
+            createFile(path, postcssFilename, `module.exports=${JSON.stringify(postcssCont, null, 2)}`);
+            createFile(path, tailwindFilename, `module.exports=${JSON.stringify(tailwindCont, null, 2)}`);
+            createFile(path+"/src", appCssname, appCssCont);
+            createFile(path, svelteConfigName, pretty(svelteConfigCont));
+            Loader.stop("tailwindcss successfully setup.", null);
+
+        } catch (e: any) {
+            logger.error(e)
+        }
+    }
+
     public handleFrontendSetup(promptInput: ProjectOptions) {
         const {frontendFramework, frontendStyling} : any = promptInput;
       
@@ -415,14 +472,14 @@ class SetupFrontend extends ProjectBaseSetup{
             
             await copyDirectoryToDestination(from, to);
             
-            const pkgJsonData : any = await this.configureReactPkgJson(newPkgJsonPath, projectName, frontendStyling as string);
+            const pkgJsonData : any = await this.configureSveltePkgJson(newPkgJsonPath, projectName, frontendStyling as string);
 
             if(pkgJsonData === null && Object.entries(pkgJsonData).length === 0) return;
             
             await this.updateFrameworkTemplateFiles(promptInput, to);
             await updateFileContent(newPkgJsonPath, JSON.stringify(pkgJsonData, null, 2));
             
-            await this.configureSveltePkgJson(to, projectName, frontendStyling as string)
+            await this.configureSvelteTailwindCss(to)
 
             const shouldInstall = await this.askDependenciesInstalled();
             let hasInstalled = false;
