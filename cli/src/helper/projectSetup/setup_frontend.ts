@@ -101,6 +101,8 @@ class SetupFrontend extends ProjectBaseSetup{
             return this.isReactAndTailwind(promptInput);
           case "react-css module":
             return this.isReactAndCssModule(promptInput);
+        case "svelte-tailwindcss":
+            return this.isSvelteAndTailwindCss(promptInput);
           default:
             // code to handle other cases or an error
         }
@@ -114,7 +116,6 @@ class SetupFrontend extends ProjectBaseSetup{
         return this.handleFrontendSetup(promptInput)
     }
 
-    // if the frontend framework choosen is vanilla and styling used is tailwindcss
     protected async isVanillaAndTailwind(promptInput: ProjectOptions){
         const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
         const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/vanilla` : `/ts_support/vanilla`
@@ -204,7 +205,6 @@ class SetupFrontend extends ProjectBaseSetup{
         }
     }
 
-    // if framework choosen is vanilla and css module
     protected async isVanillaAndCssModule(promptInput: ProjectOptions){
         const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
         const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/vanilla` : `/ts_support/vanilla`
@@ -375,6 +375,55 @@ class SetupFrontend extends ProjectBaseSetup{
             await this.updateFrameworkTemplateFiles(promptInput, to);
             await updateFileContent(newPkgJsonPath, JSON.stringify(pkgJsonData, null, 2));
             
+            const shouldInstall = await this.askDependenciesInstalled();
+            let hasInstalled = false;
+            
+            if(shouldInstall){
+                await installDepInPkgJson(to);
+                hasInstalled = true;
+            }
+
+            const shouldInitializeGit = await this.askForGitInit();
+            
+            if(shouldInitializeGit){
+                await initializeGit(to);
+            }
+
+            this.showWelcomeMessage(vanillSetupMessage, hasInstalled, cleanProjectName, to);
+
+        } catch (e: any) {
+            logger.error(e)
+        }
+    }
+
+    protected async isSvelteAndTailwindCss(promptInput: ProjectOptions){
+        const {projectName, projectType, architecture, stack, variant, frontendFramework, frontendStyling} = promptInput;
+        const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/svelte/` : `/ts_support/svelte/`
+        const reactDir = path.join("./",CLIENT_TEMPLATE_DIR, templatePath);
+        const cleanProjectName = cleanUpProjectName(projectName)
+        const dest_path = getCwd();
+
+        if(cleanProjectName !== "."){
+            await createFolder(cleanProjectName, dest_path)
+        }
+
+        try {
+            const projDirPath = `${getCwd()}/${cleanProjectName}`;
+            const from = reactDir;
+            const to = projDirPath;
+            const newPkgJsonPath = `${to}/package.json`
+            
+            await copyDirectoryToDestination(from, to);
+            
+            const pkgJsonData : any = await this.configureReactPkgJson(newPkgJsonPath, projectName, frontendStyling as string);
+
+            if(pkgJsonData === null && Object.entries(pkgJsonData).length === 0) return;
+            
+            await this.updateFrameworkTemplateFiles(promptInput, to);
+            await updateFileContent(newPkgJsonPath, JSON.stringify(pkgJsonData, null, 2));
+            
+            await this.configureSveltePkgJson(to, projectName, frontendStyling as string)
+
             const shouldInstall = await this.askDependenciesInstalled();
             let hasInstalled = false;
             

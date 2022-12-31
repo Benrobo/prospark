@@ -2,7 +2,7 @@ import ProjectOptions from "../../@types/project.js";
 import chalk from "chalk";
 import inquirer from "inquirer";
 import showLoading from "../../util/loader.js";
-import { REACT_APP_JSX, REACT_INDEX_HTML, VANILLA_CSS_CONTENT } from "../../data/template.js";
+import { APP_SVELTE, COUNTER_SVELTE, REACT_APP_JSX, REACT_INDEX_HTML, VANILLA_CSS_CONTENT } from "../../data/template.js";
 import { createFolder, createFile, updateFileContent } from "../../helper/file-manager.js";
 import pretty from "pretty"
 import logger from "../../util/logger.js";
@@ -86,6 +86,39 @@ class ProjectBaseSetup{
         }
     }
 
+    protected async configureSveltePkgJson(path: string, projectName: string, styling: string){
+        const loader = await showLoading()
+        try {
+            const pkgJsonData = getPackageJsonDataFromPath(path);
+
+            pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName
+            pkgJsonData["description"] = this.scaffoldDesc;
+            
+            loader.start("updating package.json...")
+
+            if(styling === "tailwindcss"){
+                let tailwindcss = await getPkgVersion("tailwindcss"),
+                postcss = await getPkgVersion("postcss"),
+                autoprefixer = await getPkgVersion("autoprefixer")
+            
+                pkgJsonData["devDependencies"] = {
+                    ...pkgJsonData["devDependencies"], 
+                    "tailwindcss" : tailwindcss,
+                    "postcss" : postcss,
+                    "autoprefixer" : autoprefixer,
+                }
+            }
+
+            loader.stop("package.json updated.", null);
+    
+            return pkgJsonData;
+        } catch (e: any) {
+            loader.stop(null, e.message);
+            logger.error(e)
+            return null;
+        }
+    }
+
     public async setupCssModule(promptInput: ProjectOptions, dest_path: string){
         const {frontendFramework, variant} = promptInput;
         const Loader = await showLoading();
@@ -122,7 +155,9 @@ class ProjectBaseSetup{
         const fileExt = variant.toLowerCase() === "javascript" ? "jsx" : "tsx"
         const projType = projectType.toLowerCase() === "blank" ? "Blank Project" : "Starter Project"
         const appJsx = mainDir+`/src/App.${fileExt}`,
-        htmlFile = mainDir+`/index.html`
+        htmlFile = mainDir+`/index.html`,
+        appSvelte = mainDir+`/App.svelte`,
+        counterSvelte = mainDir+`/lib/Counter.svelte`
 
 
         if(frontendFramework?.toLowerCase() === "react"){
@@ -149,6 +184,53 @@ class ProjectBaseSetup{
     
                     await updateFileContent(appJsx, pretty(AppJsx), false)
                     await updateFileContent(htmlFile, pretty(reactIndexHtml), false)
+                }
+
+                if(frontendStyling === "css module"){
+                    const AppJsx = REACT_APP_JSX
+                    .replace("{{styling}}", "import './App.css'\n")
+                    .replace("{{markup_content}}", `
+                    <div className="card">
+                        <h3>React(${variant}) + CssModule</h3>
+                        <br />
+                        <button onClick={() => setCount((count) => count + 1)}>
+                            count is {count}
+                        </button>
+                        <br />
+                        <p>${projType}</p>
+                    </div>
+                    `)
+
+                    const reactIndexHtml = REACT_INDEX_HTML
+                    .replace("{{title}}", "Prospark App")
+                    .replace("{{script_link}}", `./src/main.${fileExt}`)
+    
+                    await updateFileContent(appJsx, pretty(AppJsx), false)
+                    await updateFileContent(htmlFile, pretty(reactIndexHtml), false)
+                }
+
+            } catch (e: any) {
+                logger.error(e)
+            }
+
+        }
+        if(frontendFramework?.toLowerCase() === "svelte"){
+            try {
+    
+                if(frontendStyling === "tailwindcss"){
+                    const CounterSvelte = COUNTER_SVELTE
+                    .replace("{{styling}}", 'class="px-3 py-2 rounded-md bg-[#000]"')
+                    
+                    const AppSvelte = APP_SVELTE
+                    .replace("{{heading}}", `
+                    <h3 className="text-white-200 text-[25px] font-extrabold">Svelte(${variant}) + Tailwindcss</h3>
+                        <br />
+                        <p>${projType}</p>
+                    </div>
+                    `)
+    
+                    await updateFileContent(counterSvelte, pretty(CounterSvelte), false)
+                    await updateFileContent(appSvelte, pretty(AppSvelte), false)
                 }
 
                 if(frontendStyling === "css module"){

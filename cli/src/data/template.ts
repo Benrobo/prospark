@@ -149,5 +149,31 @@ export const REACT_INDEX_HTML = `
     <script type="module" src="{{script_link}}"></script>
   </body>
 </html>
+`
 
+export const APP_SVELTE = `
+<script>
+  import Counter from './lib/Counter.svelte'
+</script>
+
+<main>
+  {{heading}}
+
+  <div class="card">
+    <Counter />
+  </div>
+</main>
+`
+
+export const COUNTER_SVELTE = `
+<script>
+  let count = 0
+  const increment = () => {
+    count += 1
+  }
+</script>
+
+<button {{styling}} on:click={increment}>
+  count is {count}
+</button>
 `
