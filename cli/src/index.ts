@@ -10,7 +10,7 @@ import initializePrompt from "./commands/prompt.js";
 async function run(){
     console.log("")
 
-    // renderTitle()
+    renderTitle()
     // showCliCommands()
 
     initializePrompt()
