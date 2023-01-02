@@ -146,6 +146,8 @@ class SetupFrontend extends ProjectBaseSetup{
             return this.isSvelteAndTailwindCss(promptInput);
         case "svelte-css module":
             return this.isSvelteAndCssModule(promptInput)
+        case "nextjs-tailwindcss":
+            return this.isNextjsAndTailwindcss(promptInput)
           default:
             // code to handle other cases or an error
         }
@@ -533,6 +535,10 @@ class SetupFrontend extends ProjectBaseSetup{
         } catch (e: any) {
             logger.error(e)
         }
+    }
+
+    protected async isNextjsAndTailwindcss(promptInput: ProjectOptions){
+
     }
 }
 
