@@ -11,37 +11,37 @@ const scaffoldQuestions = [
         prefix: chalk.greenBright("\n?"),
         default: PROJECTNAME
     },
-    {
-        type: 'list',
-        name: 'projectType',
-        message: 'Project Type:',
-        prefix: chalk.greenBright("\n?"),
-        choices: [
-            'Blank',
-            'Starter',
-            'SAAS',
-        ]
-    },
+    // {
+    //     type: 'list',
+    //     name: 'projectType',
+    //     message: 'Project Type:',
+    //     prefix: chalk.greenBright("\n?"),
+    //     choices: [
+    //         'Blank',
+    //         'Starter',
+    //         'SAAS',
+    //     ]
+    // }, // COMING SOON
     {
         type: 'list',
         name: 'architecture',
         message: 'Select an architecture:',
         prefix: chalk.greenBright("\n?"),
-        choices: ['Poly-repo','Mono-repo']
+        choices: ['Poly-repo', 'Mono-repo']
     },
     {
         type: 'list',
         name: 'stack',
         message: 'Select stack:',
         prefix: chalk.greenBright("\n?"),
-        choices: ['frontend','backend','fullstack']
+        choices: ['frontend', 'backend', 'fullstack']
     },
     {
         type: 'list',
         name: 'variant',
         message: 'Select Variant:',
         prefix: chalk.greenBright("\n?"),
-        choices: ['Typescript','Javascript']
+        choices: ['Javascript', 'Typescript']
     },
     {
         type: 'list',
@@ -69,24 +69,24 @@ const scaffoldQuestions = [
     },
     {
         type: 'list',
-        name: 'backendRestWithTypescript',
+        name: 'backendPreset', // language || framework
         message: 'Select backend (REST):',
         prefix: chalk.greenBright("\n?"),
         choices: [
-            'Nodejs',
-            'Nodejs && Express',
+            'Nextjs',
+            'Nodejs/Express',
             'Nestjs',
         ],
         when: (answers: any) => (answers.stack === 'backend' || answers.stack === "fullstack") && answers.variant === "Typescript"
     },
     {
         type: 'list',
-        name: 'backendRestWithJavascript',
+        name: 'backendPreset',
         message: 'Select backend (REST):',
         prefix: chalk.greenBright("\n?"),
         choices: [
-            'Nodejs',
-            'Nodejs && Express'
+            'Nextjs',
+            'Nodejs/Express'
         ],
         when: (answers: any) => (answers.stack === 'backend' || answers.stack === "fullstack") && answers.variant === "Javascript"
     },

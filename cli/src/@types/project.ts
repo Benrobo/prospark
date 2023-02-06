@@ -5,8 +5,7 @@ interface ProjectOptions {
     architecture: string;
     stack: string;
     variant: string;
-    backendRestWithTypescript?: string;
-    backendRestWithJavascript?: string;
+    backendPreset?: string;
     backendDatabase?: boolean;
     backendDatabaseType?: string;
     frontendFramework?: string;
