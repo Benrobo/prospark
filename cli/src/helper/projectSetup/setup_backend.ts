@@ -1,16 +1,25 @@
-import { CLIENT_TEMPLATE_DIR, SCRIPT_TITLE } from "../../config/index.js";
+import { SERVER_TEMPLATE_DIR, SCRIPT_TITLE } from "../../config/index.js";
 import ProjectOptions from "../../@types/project.js";
 import path from "path";
 import { getPackageJsonDataFromPath } from "../../helper/getPackageJson.js";
 import getCwd from "../../util/getCwd.js";
-import { copyDirectoryToDestination, createFile, createFolder, readFileData, updateFileContent } from "../../helper/file-manager.js";
-import pretty from "pretty"
+import {
+  copyDirectoryToDestination,
+  createFile,
+  createFolder,
+  readFileData,
+  updateFileContent,
+} from "../../helper/file-manager.js";
+import pretty from "pretty";
 import cleanUpProjectName from "../../util/cleanProjectName.js";
 import logger from "../../util/logger.js";
 import showLoading from "../../util/loader.js";
 import { installDepInPkgJson } from "../../helper/installDependencies.js";
 import chalk from "chalk";
-import { VANILLA_CSS_CONTENT, VANILLA_HTML_CONTENT } from "../../data/template.js";
+import {
+  VANILLA_CSS_CONTENT,
+  VANILLA_HTML_CONTENT,
+} from "../../data/template.js";
 import { vanillSetupMessage } from "../../const/index.js";
 import initializeGit from "../../helper/initGit.js";
 import ProjectBaseSetup from "./base_setup.js";
@@ -33,142 +42,141 @@ import fs from "fs-extra";
 */
 
 enum Variant {
-    JS = "javascript",
-    TS = "typescript"
+  JS = "javascript",
+  TS = "typescript",
 }
 
 class SetupBackend extends ProjectBaseSetup {
+  protected variant;
+  public constructor(promptInput: ProjectOptions) {
+    super();
+    this.variant = promptInput.variant;
+    this.variant.toLowerCase() === "javascript" &&
+      this.handleJavascriptSetup(promptInput);
+    this.variant.toLowerCase() === "typescript" &&
+      this.handleTypescriptSetup(promptInput);
+  }
 
-    protected variant;
-    public constructor(promptInput: ProjectOptions) {
-        super()
-        this.variant = promptInput.variant;
-        this.variant.toLowerCase() === "javascript" && this.handleJavascriptSetup(promptInput);
-        this.variant.toLowerCase() === "typescript" && this.handleTypescriptSetup(promptInput);
-    }
+  protected async configureReactTailwindCss(path: string) {
+    if (!fs.pathExistsSync(path)) return;
 
+    const Loader = await showLoading();
 
-    protected async configureReactTailwindCss(path: string) {
-
-        if (!fs.pathExistsSync(path)) return;
-
-        const Loader = await showLoading()
-
-        try {
-            // files and file content
-            let postcssFilename = `postcss.config.cjs`,
-                postcssCont = {
-                    plugins: {
-                        tailwindcss: {},
-                        autoprefixer: {},
-                    }
-                },
-                tailwindFilename = `tailwind.config.cjs`,
-                tailwindCont = {
-                    content: ["./index.html", "./src/**/*.{html,js,jsx,ts,tsx}"],
-                    theme: {
-                        extend: {},
-                    },
-                    plugins: [],
-                },
-                indexCssname = `index.css`,
-                indexCssCont = `
+    try {
+      // files and file content
+      let postcssFilename = `postcss.config.cjs`,
+        postcssCont = {
+          plugins: {
+            tailwindcss: {},
+            autoprefixer: {},
+          },
+        },
+        tailwindFilename = `tailwind.config.cjs`,
+        tailwindCont = {
+          content: ["./index.html", "./src/**/*.{html,js,jsx,ts,tsx}"],
+          theme: {
+            extend: {},
+          },
+          plugins: [],
+        },
+        indexCssname = `index.css`,
+        indexCssCont = `
             @tailwind base;
             @tailwind components;
             @tailwind utilities;
-            `.replace(/^\s+/gm, '')
+            `.replace(/^\s+/gm, "");
 
-            Loader.start("setting up tailwindcss...")
-            createFile(path, postcssFilename, `module.exports=${JSON.stringify(postcssCont, null, 2)}`);
-            createFile(path, tailwindFilename, `module.exports=${JSON.stringify(tailwindCont, null, 2)}`);
-            createFile(path + "/src", indexCssname, indexCssCont);
-            Loader.stop("tailwindcss successfully setup.", null);
-
-        } catch (e: any) {
-            logger.error(e)
-        }
+      Loader.start("setting up tailwindcss...");
+      createFile(
+        path,
+        postcssFilename,
+        `module.exports=${JSON.stringify(postcssCont, null, 2)}`
+      );
+      createFile(
+        path,
+        tailwindFilename,
+        `module.exports=${JSON.stringify(tailwindCont, null, 2)}`
+      );
+      createFile(path + "/src", indexCssname, indexCssCont);
+      Loader.stop("tailwindcss successfully setup.", null);
+    } catch (e: any) {
+      logger.error(e);
     }
+  }
 
-    protected async configureSvelteTailwindCss(path: string) {
+  protected async configureSvelteTailwindCss(path: string) {
+    if (!fs.pathExistsSync(path)) return;
 
-        if (!fs.pathExistsSync(path)) return;
+    const Loader = await showLoading();
 
-        const Loader = await showLoading()
-
-        try {
-            // files and file content
-            let postcssFilename = `postcss.config.cjs`,
-                postcssCont = {
-                    plugins: {
-                        tailwindcss: {},
-                        autoprefixer: {},
-                    }
-                },
-                tailwindFilename = `tailwind.config.cjs`,
-                tailwindCont = {
-                    content: ['./src/**/*.{html,js,svelte,ts}'],
-                    theme: {
-                        extend: {},
-                    },
-                    plugins: [],
-                },
-                appCssname = `app.css`,
-                appCssCont = `
+    try {
+      // files and file content
+      let postcssFilename = `postcss.config.cjs`,
+        postcssCont = {
+          plugins: {
+            tailwindcss: {},
+            autoprefixer: {},
+          },
+        },
+        tailwindFilename = `tailwind.config.cjs`,
+        tailwindCont = {
+          content: ["./src/**/*.{html,js,svelte,ts}"],
+          theme: {
+            extend: {},
+          },
+          plugins: [],
+        },
+        appCssname = `app.css`,
+        appCssCont = `
             @tailwind base;
             @tailwind components;
             @tailwind utilities;
-            `.replace(/^\s+/gm, '')
+            `.replace(/^\s+/gm, "");
 
-            Loader.start("setting up tailwindcss...")
-            createFile(path, postcssFilename, `module.exports=${JSON.stringify(postcssCont, null, 2)}`);
-            createFile(path, tailwindFilename, `module.exports=${JSON.stringify(tailwindCont, null, 2)}`);
-            createFile(path + "/src", appCssname, appCssCont);
-            Loader.stop("tailwindcss successfully setup.", null);
-
-        } catch (e: any) {
-            logger.error(e)
-        }
+      Loader.start("setting up tailwindcss...");
+      createFile(
+        path,
+        postcssFilename,
+        `module.exports=${JSON.stringify(postcssCont, null, 2)}`
+      );
+      createFile(
+        path,
+        tailwindFilename,
+        `module.exports=${JSON.stringify(tailwindCont, null, 2)}`
+      );
+      createFile(path + "/src", appCssname, appCssCont);
+      Loader.stop("tailwindcss successfully setup.", null);
+    } catch (e: any) {
+      logger.error(e);
     }
+  }
 
-    public handleBackendSetup(promptInput: ProjectOptions) {
-        const { backendPreset, frontendStyling }: any = promptInput;
+  public handleBackendSetup(promptInput: ProjectOptions) {
+    const { backendPreset }: any = promptInput;
 
-        switch (`${backendPreset.toLowerCase()}-${frontendStyling.toLowerCase()}`) {
-            case "vanilla-tailwindcss":
-            // return this.isVanillaAndTailwind(promptInput);
-            case "vanilla-css module":
-            // return this.isVanillaAndCssModule(promptInput);
-            case "react-tailwindcss":
-            // return this.isReactAndTailwind(promptInput);
-            case "react-css module":
-            // return this.isReactAndCssModule(promptInput);
-            case "svelte-tailwindcss":
-            // return this.isSvelteAndTailwindCss(promptInput);
-            case "svelte-css module":
-            // return this.isSvelteAndCssModule(promptInput)
-            case "nextjs-tailwindcss":
-            // return this.isNextjsAndTailwindcss(promptInput)
-            default:
-            // code to handle other cases or an error
-        }
+    switch (`${backendPreset.toLowerCase()}`) {
+      case "nodejs/express":
+        return this.isNodejsAndExpress(promptInput);
+      case "vanilla-css module":
+      // code to handle other cases or an error
     }
+  }
 
-    public async handleJavascriptSetup(promptInput: ProjectOptions) {
-        const { projectName, projectType, architecture, stack, variant, backendPreset, frontendStyling } = promptInput;
-        const templatePath = variant.toLowerCase() === Variant.JS ? `/js_support/vanilla` : `/ts_support/vanilla`
-        const vanillaDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
-        const cleanProjectName = cleanUpProjectName(projectName)
+  public async handleJavascriptSetup(promptInput: ProjectOptions) {
+    return this.handleBackendSetup(promptInput);
+  }
 
-        const dest_path = getCwd();
+  public handleTypescriptSetup(promptInput: ProjectOptions) {
+    return this.handleBackendSetup(promptInput);
+  }
 
-        if (cleanProjectName !== ".") {
-            await createFolder(cleanProjectName, dest_path)
-        }
-    }
-
-    public handleTypescriptSetup(promptInput: ProjectOptions) {
-        return this.handleBackendSetup(promptInput)
-    }
+  public isNodejsAndExpress(promptInput: ProjectOptions) {
+    const { projectName, backendDatabase, stack, variant } = promptInput;
+    const templatePath =
+      variant.toLowerCase() === Variant.JS
+        ? `/js_support/node_exp/`
+        : `/ts_support/node_exp/`;
+  }
 }
 
-export default SetupBackend
+export default SetupBackend;
