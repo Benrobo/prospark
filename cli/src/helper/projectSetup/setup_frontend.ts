@@ -1,7 +1,10 @@
 import { CLIENT_TEMPLATE_DIR, SCRIPT_TITLE } from "../../config/index.js";
 import ProjectOptions from "../../@types/project.js";
 import path from "path";
-import { getPackageJsonDataFromPath } from "../../helper/getPackageJson.js";
+import {
+  ReturnPackageJson,
+  getPackageJsonDataFromPath,
+} from "../../helper/getPackageJson.js";
 import getCwd from "../../util/getCwd.js";
 import {
   copyDirectoryToDestination,
@@ -272,7 +275,9 @@ class SetupFrontend extends ProjectBaseSetup {
       // copy template folder to cwd where this command is been initiated.
       await copyDirectoryToDestination(from, to);
 
-      let pkgJsonData = getPackageJsonDataFromPath(to + "/package.json");
+      let pkgJsonData = getPackageJsonDataFromPath(
+        to + "/package.json"
+      ) as ReturnPackageJson;
       pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
       pkgJsonData["description"] = this.scaffoldDesc;
 
@@ -393,7 +398,9 @@ class SetupFrontend extends ProjectBaseSetup {
       // copy template folder to cwd where this command is been executed.
       await copyDirectoryToDestination(from, to);
 
-      let pkgJsonData = getPackageJsonDataFromPath(to + "/package.json");
+      let pkgJsonData = getPackageJsonDataFromPath(
+        to + "/package.json"
+      ) as ReturnPackageJson;
       pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
       pkgJsonData["description"] = this.scaffoldDesc;
 
