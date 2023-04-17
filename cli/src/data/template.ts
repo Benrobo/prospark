@@ -1,5 +1,3 @@
-
-
 // vanilla html file content
 export const VANILLA_HTML_CONTENT = `
 <!DOCTYPE html>
@@ -100,7 +98,7 @@ export const VANILLA_CSS_CONTENT = `
   }
   
 
-`
+`;
 
 // React file content (Javascript support)
 
@@ -117,7 +115,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>
 )
-`
+`;
 
 export const REACT_APP_JSX = `
 import { useState } from 'react'
@@ -133,7 +131,7 @@ function App() {
 }
 
 export default App
-`
+`;
 
 export const REACT_INDEX_HTML = `
 <!DOCTYPE html>
@@ -149,7 +147,7 @@ export const REACT_INDEX_HTML = `
     <script type="module" src="{{script_link}}"></script>
   </body>
 </html>
-`
+`;
 
 export const APP_SVELTE = `
 <script>
@@ -159,7 +157,7 @@ export const APP_SVELTE = `
 <main>
   {{markup}}
 </main>
-`
+`;
 
 export const COUNTER_SVELTE = `
 <script>
@@ -172,7 +170,7 @@ export const COUNTER_SVELTE = `
 <button {{styling}} on:click={increment}>
   count is {count}
 </button>
-`
+`;
 
 export const SVELTE_INDEX_HTML = `
 <!DOCTYPE html>
@@ -188,4 +186,19 @@ export const SVELTE_INDEX_HTML = `
     <script type="module" src="{{script_link}}"></script>
   </body>
 </html>
-`
+`;
+
+export const NEXT_INDEX_JS = `
+import { useState } from 'react'
+function Home() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div className="App">
+      {{markup_content}}
+    </div>
+  )
+}
+
+export default App
+`;
