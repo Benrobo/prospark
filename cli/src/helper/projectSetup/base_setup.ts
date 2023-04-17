@@ -46,7 +46,7 @@ class ProjectBaseSetup {
         fileExt = "js";
         break;
       case "nextjs-typescript":
-        fileExt = "ts";
+        fileExt = "tsx";
         break;
       case "vanilla-javascript":
         fileExt = "js";
@@ -261,21 +261,15 @@ class ProjectBaseSetup {
     promptInput: ProjectOptions,
     dest_path: string
   ) {
-    const { frontendFramework, variant, projectType, frontendStyling } =
-      promptInput;
+    const { frontendFramework, variant, frontendStyling } = promptInput;
     const mainDir = `${dest_path}`;
     const fileExt = this.getIndexScriptExt(promptInput);
-    const projType =
-      projectType.toLowerCase() === "blank"
-        ? "Blank Project"
-        : "Starter Project";
     const appJsx = mainDir + `/src/App.${fileExt}`,
       nextIndexJs = mainDir + `/pages/index.${fileExt}`,
       htmlFile = mainDir + `/index.html`,
       appSvelte = mainDir + `/src/App.svelte`,
       counterSvelte = mainDir + `/src/lib/Counter.svelte`,
       svelteHtmlFile = mainDir + `/index.html`;
-
     if (frontendFramework?.toLowerCase() === "react") {
       try {
         if (frontendStyling === "tailwindcss") {
@@ -289,7 +283,6 @@ class ProjectBaseSetup {
                             count is {count}
                         </button>
                         <br />
-                        <p>${projType}</p>
                     </div>
                     `
           );
@@ -317,7 +310,6 @@ class ProjectBaseSetup {
                             count is {count}
                         </button>
                         <br />
-                        <p>${projType}</p>
                     </div>
                     `
           );
@@ -351,7 +343,6 @@ class ProjectBaseSetup {
                             <Counter />
                         </div>
                         <br />
-                        <p class="text-[#ccc] font-medium">${projType}</p>
                     </div>
                     `
           );
@@ -376,10 +367,9 @@ class ProjectBaseSetup {
           const AppSvelte = APP_SVELTE.replace(
             "{{markup}}",
             `
-                    <h3 class="heading">Svelte(${variant}) + CssModule</h3>
-                    <Counter />
-                    <p>${projType}</p>
-                    `
+            <h3 class="heading">Svelte(${variant}) + CssModule</h3>
+            <Counter />
+            `
           );
 
           const svelteIndexHtmlCont = SVELTE_INDEX_HTML.replace(
@@ -399,23 +389,22 @@ class ProjectBaseSetup {
         logger.error(e);
       }
     }
-    console.log({ frontendFramework });
+
     if (frontendFramework?.toLowerCase() === "nextjs") {
       try {
         if (frontendStyling === "tailwindcss") {
           const IndexJs = NEXT_INDEX_JS.replace(
             "{{markup_content}}",
             `
-                    <div className="w-full h-[100vh] flex flex-col items-center justify-center bg-blue-400 text-[#fff] ">
-                        <h3 className="text-white-200 text-[25px] font-extrabold">Nextjs(${variant}) + Tailwindcss</h3>
-                        <br />
-                        <button className='px-4 py-2 rounded-md bg-blue-600' onClick={() => setCount((count) => count + 1)}>
-                            count is {count}
-                        </button>
-                        <br />
-                        <p>${projType}</p>
-                    </div>
-                    `
+                        <div className="w-full h-[100vh] flex flex-col items-center justify-center bg-blue-400 text-[#fff] ">
+                            <h3 className="text-white-200 text-[25px] font-extrabold">Nextjs(${variant}) + Tailwindcss</h3>
+                            <br />
+                            <button className='px-4 py-2 rounded-md bg-blue-600' onClick={() => setCount((count) => count + 1)}>
+                                count is {count}
+                            </button>
+                            <br />
+                        </div>
+                        `
           );
 
           await updateFileContent(nextIndexJs, pretty(IndexJs), false);
@@ -435,7 +424,6 @@ class ProjectBaseSetup {
                             count is {count}
                         </button>
                         <br />
-                        <p>${projType}</p>
                     </div>
                     `
           );

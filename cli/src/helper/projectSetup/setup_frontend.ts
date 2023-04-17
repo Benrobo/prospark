@@ -8,6 +8,7 @@ import {
   createFile,
   createFolder,
   readFileData,
+  removeFile,
   updateFileContent,
 } from "../../helper/file-manager.js";
 import pretty from "pretty";
@@ -148,6 +149,10 @@ class SetupFrontend extends ProjectBaseSetup {
         `module.exports=${JSON.stringify(tailwindCont, null, 2)}`
       );
       createFile(path + "/styles", globalCssname, globalCssCont);
+
+      // remove css module file
+      removeFile(path + "/styles", "Home.module.css");
+
       Loader.stop("tailwindcss successfully setup.", null);
     } catch (e: any) {
       logger.error(e);
@@ -222,7 +227,7 @@ class SetupFrontend extends ProjectBaseSetup {
       case "nextjs-tailwindcss":
         return this.isNextjsAndTailwindcss(promptInput);
       case "nextjs-css module":
-      // return this.isNextjsAndTailwindcss(promptInput);
+        return this.isNextjsAndCssModule(promptInput);
       default:
       // code to handle other cases or an error
     }
@@ -771,6 +776,77 @@ class SetupFrontend extends ProjectBaseSetup {
   }
 
   protected async isNextjsAndTailwindcss(promptInput: ProjectOptions) {
+    const {
+      projectName,
+      projectType,
+      architecture,
+      stack,
+      variant,
+      frontendFramework,
+      frontendStyling,
+    } = promptInput;
+    const templatePath =
+      variant.toLowerCase() === Variant.JS
+        ? `/js_support/nextjs/`
+        : `/ts_support/nextjs/`;
+    const reactDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
+    const cleanProjectName = cleanUpProjectName(projectName);
+    const dest_path = getCwd();
+
+    if (cleanProjectName !== ".") {
+      await createFolder(cleanProjectName, dest_path);
+    }
+
+    try {
+      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const from = reactDir;
+      const to = projDirPath;
+      const newPkgJsonPath = `${to}/package.json`;
+
+      await copyDirectoryToDestination(from, to);
+
+      const pkgJsonData: any = await this.configureNextjsPkgJson(
+        newPkgJsonPath,
+        projectName,
+        frontendStyling as string
+      );
+
+      if (pkgJsonData === null && Object.entries(pkgJsonData).length === 0)
+        return;
+
+      await this.updateFrameworkTemplateFiles(promptInput, to);
+      await updateFileContent(
+        newPkgJsonPath,
+        JSON.stringify(pkgJsonData, null, 2)
+      );
+
+      await this.configureNextjsTailwindCss(to);
+
+      const shouldInstall = await this.askDependenciesInstalled();
+      let hasInstalled = false;
+
+      if (shouldInstall) {
+        await installDepInPkgJson(to);
+        hasInstalled = true;
+      }
+
+      const shouldInitializeGit = await this.askForGitInit();
+
+      if (shouldInitializeGit) {
+        await initializeGit(to);
+      }
+
+      this.showWelcomeMessage(
+        vanillSetupMessage,
+        hasInstalled,
+        cleanProjectName,
+        to
+      );
+    } catch (e: any) {
+      logger.error(e);
+    }
+  }
+  protected async isNextjsAndCssModule(promptInput: ProjectOptions) {
     const {
       projectName,
       projectType,
