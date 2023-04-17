@@ -18,7 +18,10 @@ import {
 } from "../../helper/file-manager.js";
 import pretty from "pretty";
 import logger from "../../util/logger.js";
-import { getPackageJsonDataFromPath } from "../../helper/getPackageJson.js";
+import {
+  ReturnPackageJson,
+  getPackageJsonDataFromPath,
+} from "../../helper/getPackageJson.js";
 import getPkgVersion from "../../helper/getPkgVersion.js";
 import { SCRIPT_TITLE } from "../../config/index.js";
 
@@ -116,7 +119,7 @@ class ProjectBaseSetup {
   ) {
     const loader = await showLoading();
     try {
-      const pkgJsonData = getPackageJsonDataFromPath(path);
+      const pkgJsonData = getPackageJsonDataFromPath(path) as ReturnPackageJson;
 
       pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
       pkgJsonData["description"] = this.scaffoldDesc;
@@ -153,7 +156,7 @@ class ProjectBaseSetup {
   ) {
     const loader = await showLoading();
     try {
-      const pkgJsonData = getPackageJsonDataFromPath(path);
+      const pkgJsonData = getPackageJsonDataFromPath(path) as ReturnPackageJson;
 
       pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
       pkgJsonData["description"] = this.scaffoldDesc;
@@ -191,7 +194,7 @@ class ProjectBaseSetup {
   ) {
     const loader = await showLoading();
     try {
-      const pkgJsonData = getPackageJsonDataFromPath(path);
+      const pkgJsonData = getPackageJsonDataFromPath(path) as ReturnPackageJson;
 
       pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
       pkgJsonData["description"] = this.scaffoldDesc;
@@ -210,6 +213,46 @@ class ProjectBaseSetup {
           autoprefixer: autoprefixer,
         };
       }
+
+      loader.stop("package.json updated.", null);
+
+      return pkgJsonData;
+    } catch (e: any) {
+      loader.stop(null, e.message);
+      logger.error(e);
+      return null;
+    }
+  }
+
+  protected async configureNodeExpPkgJson(
+    path: string,
+    projectName: string,
+    shouldUseDB: boolean,
+    databaseType: string | null
+  ) {
+    const loader = await showLoading();
+    try {
+      const pkgJsonData = getPackageJsonDataFromPath(path) as ReturnPackageJson;
+
+      if (!shouldUseDB) {
+        if (
+          typeof pkgJsonData.dependencies !== "undefined" &&
+          typeof pkgJsonData.devDependencies !== "undefined"
+        )
+          delete pkgJsonData.dependencies["mongoose"];
+        delete pkgJsonData.devDependencies["prisma"];
+        delete pkgJsonData.scripts["migrate:prisma"];
+      }
+
+      if (shouldUseDB && databaseType?.toLowerCase() === "mongodb") {
+        delete pkgJsonData.devDependencies["prisma"];
+        delete pkgJsonData.scripts["migrate:prisma"];
+      }
+
+      pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
+      pkgJsonData["description"] = this.scaffoldDesc;
+
+      loader.start("updating package.json...");
 
       loader.stop("package.json updated.", null);
 
