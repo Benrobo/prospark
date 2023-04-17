@@ -1,7 +1,10 @@
 import { SERVER_TEMPLATE_DIR, SCRIPT_TITLE } from "../../config/index.js";
 import ProjectOptions from "../../@types/project.js";
 import path from "path";
-import { getPackageJsonDataFromPath } from "../../helper/getPackageJson.js";
+import {
+  ReturnPackageJson,
+  getPackageJsonDataFromPath,
+} from "../../helper/getPackageJson.js";
 import getCwd from "../../util/getCwd.js";
 import {
   copyDirectoryToDestination,
@@ -57,7 +60,7 @@ class SetupBackend extends ProjectBaseSetup {
       this.handleTypescriptSetup(promptInput);
   }
 
-  protected async configureReactTailwindCss(path: string) {
+  protected async configureNodeExp(path: string) {
     if (!fs.pathExistsSync(path)) return;
 
     const Loader = await showLoading();
@@ -104,53 +107,6 @@ class SetupBackend extends ProjectBaseSetup {
     }
   }
 
-  protected async configureSvelteTailwindCss(path: string) {
-    if (!fs.pathExistsSync(path)) return;
-
-    const Loader = await showLoading();
-
-    try {
-      // files and file content
-      let postcssFilename = `postcss.config.cjs`,
-        postcssCont = {
-          plugins: {
-            tailwindcss: {},
-            autoprefixer: {},
-          },
-        },
-        tailwindFilename = `tailwind.config.cjs`,
-        tailwindCont = {
-          content: ["./src/**/*.{html,js,svelte,ts}"],
-          theme: {
-            extend: {},
-          },
-          plugins: [],
-        },
-        appCssname = `app.css`,
-        appCssCont = `
-            @tailwind base;
-            @tailwind components;
-            @tailwind utilities;
-            `.replace(/^\s+/gm, "");
-
-      Loader.start("setting up tailwindcss...");
-      createFile(
-        path,
-        postcssFilename,
-        `module.exports=${JSON.stringify(postcssCont, null, 2)}`
-      );
-      createFile(
-        path,
-        tailwindFilename,
-        `module.exports=${JSON.stringify(tailwindCont, null, 2)}`
-      );
-      createFile(path + "/src", appCssname, appCssCont);
-      Loader.stop("tailwindcss successfully setup.", null);
-    } catch (e: any) {
-      logger.error(e);
-    }
-  }
-
   public handleBackendSetup(promptInput: ProjectOptions) {
     const { backendPreset }: any = promptInput;
 
@@ -170,12 +126,49 @@ class SetupBackend extends ProjectBaseSetup {
     return this.handleBackendSetup(promptInput);
   }
 
-  public isNodejsAndExpress(promptInput: ProjectOptions) {
-    const { projectName, backendDatabase, stack, variant } = promptInput;
+  public async isNodejsAndExpress(promptInput: ProjectOptions) {
+    const {
+      projectName,
+      backendDatabase,
+      stack,
+      variant,
+      backendDatabaseType,
+    } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
         ? `/js_support/node_exp/`
         : `/ts_support/node_exp/`;
+    const nodeExpDir = path.join("./", SERVER_TEMPLATE_DIR, templatePath);
+    const cleanProjectName = cleanUpProjectName(projectName);
+    const dest_path = getCwd();
+
+    if (cleanProjectName !== ".") {
+      await createFolder(cleanProjectName, dest_path);
+    }
+    try {
+      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const from = nodeExpDir;
+      const to = projDirPath;
+      const newPkgJsonPath = `${to}/package.json`;
+      const shouldUseDB =
+        typeof backendDatabase !== "undefined" ? backendDatabase : false;
+      const DBType =
+        typeof backendDatabaseType !== "undefined" ? backendDatabaseType : null;
+
+      await copyDirectoryToDestination(from, to);
+
+      const pkgJsonData = (await this.configureNodeExpPkgJson(
+        newPkgJsonPath,
+        projectName,
+        shouldUseDB,
+        DBType
+      )) as ReturnPackageJson;
+
+      if (pkgJsonData === null && Object.entries(pkgJsonData).length === 0)
+        return;
+    } catch (e: any) {
+      logger.error(e);
+    }
   }
 }
 
