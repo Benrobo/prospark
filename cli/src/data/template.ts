@@ -196,7 +196,7 @@ function Home() {
   const [count, setCount] = useState(0)
 
   return (
-    <div className="App">
+    <div className={{container_style}}>
       {{markup_content}}
     </div>
   )

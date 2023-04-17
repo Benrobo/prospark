@@ -393,9 +393,11 @@ class ProjectBaseSetup {
     if (frontendFramework?.toLowerCase() === "nextjs") {
       try {
         if (frontendStyling === "tailwindcss") {
-          const IndexJs = NEXT_INDEX_JS.replace(
-            "{{markup_content}}",
-            `
+          const IndexJs = NEXT_INDEX_JS.replace("{{container_style}}", `"App"`)
+            .replace("{{styling}}", "")
+            .replace(
+              "{{markup_content}}",
+              `
                         <div className="w-full h-[100vh] flex flex-col items-center justify-center bg-blue-400 text-[#fff] ">
                             <h3 className="text-white-200 text-[25px] font-extrabold">Nextjs(${variant}) + Tailwindcss</h3>
                             <br />
@@ -405,28 +407,33 @@ class ProjectBaseSetup {
                             <br />
                         </div>
                         `
-          );
+            );
 
           await updateFileContent(nextIndexJs, pretty(IndexJs), false);
         }
 
         if (frontendStyling === "css module") {
           const IndexJs = NEXT_INDEX_JS.replace(
-            "{{styling}}",
-            "import style './styles/Home.module.css'\n"
-          ).replace(
-            "{{markup_content}}",
-            `
+            "{{container_style}}",
+            "{style.main}"
+          )
+            .replace(
+              "{{styling}}",
+              "import style from '../styles/Home.module.css'\n"
+            )
+            .replace(
+              "{{markup_content}}",
+              `
                     <div className="card">
                         <h3>Nextjs(${variant}) + CssModule</h3>
                         <br />
-                        <button onClick={() => setCount((count) => count + 1)}>
+                        <button style={{padding: "10px 25px",borderRadius: 10,border: "none",outline: "none",color: "#fff",backgroundColor: "#0070f3",cursor: "pointer",fontSize: 15}} onClick={() => setCount((count) => count + 1)}>
                             count is {count}
                         </button>
                         <br />
                     </div>
                     `
-          );
+            );
 
           await updateFileContent(nextIndexJs, pretty(IndexJs), false);
         }
