@@ -190,6 +190,8 @@ export const SVELTE_INDEX_HTML = `
 
 export const NEXT_INDEX_JS = `
 import { useState } from 'react'
+{{styling}}
+
 function Home() {
   const [count, setCount] = useState(0)
 
@@ -200,5 +202,5 @@ function Home() {
   )
 }
 
-export default App
+export default Home;
 `;
