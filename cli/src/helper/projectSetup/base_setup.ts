@@ -265,15 +265,20 @@ class ProjectBaseSetup {
         if (
           typeof pkgJsonData.dependencies !== "undefined" &&
           typeof pkgJsonData.devDependencies !== "undefined"
-        )
+        ) {
           delete pkgJsonData.dependencies["mongoose"];
-        delete pkgJsonData.devDependencies["prisma"];
-        delete pkgJsonData.scripts["migrate:prisma"];
+          delete pkgJsonData.dependencies["@prisma/client"];
+          delete pkgJsonData.devDependencies["@prisma/client"];
+          delete pkgJsonData.devDependencies["prisma"];
+          delete pkgJsonData.scripts["migrate:prisma"];
+        }
       }
 
       if (shouldUseDB && databaseType?.toLowerCase() === "mongodb") {
         delete pkgJsonData.devDependencies["prisma"];
         delete pkgJsonData.scripts["migrate:prisma"];
+        delete pkgJsonData.dependencies["@prisma/client"];
+        delete pkgJsonData.devDependencies["@prisma/client"];
       }
 
       pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
@@ -526,14 +531,12 @@ class ProjectBaseSetup {
     // * Files to be updated / deleted.
     const prismaFolder = mainDir + `/prisma`;
     const appJs = mainDir + `/src/app.${fileExt}`,
-      mongodbJs = mainDir + `/src/config/mongodb.${fileExt}`,
       prismaSchema = mainDir + `/prisma/schema.prisma`,
       envJs = mainDir + `/src/config/env.${fileExt}`;
 
     let envContent = "";
 
     if (!shouldUseDB) {
-      //! remove every db config file.
       removeFile(mainDir + `/src/config`, `mongodb.${fileExt}`);
       removeFile(mainDir + `/src/config`, `prisma.${fileExt}`);
 
@@ -556,7 +559,7 @@ class ProjectBaseSetup {
           //* create .env file
           envContent = NodeExp_ENV_CONT.replace(
             "{{DB_URL}}",
-            "mongodb://localhost:27020/prospark-db"
+            "MONGODB='mongodb://localhost:27020/prospark-db'"
           );
           createFile(dest_path, ".env", envContent);
 

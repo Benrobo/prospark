@@ -19,15 +19,9 @@ import cleanUpProjectName from "../../util/cleanProjectName.js";
 import logger from "../../util/logger.js";
 import showLoading from "../../util/loader.js";
 import { installDepInPkgJson } from "../../helper/installDependencies.js";
-import chalk from "chalk";
-import {
-  VANILLA_CSS_CONTENT,
-  VANILLA_HTML_CONTENT,
-} from "../../data/template.js";
 import { vanillSetupMessage } from "../../const/index.js";
 import initializeGit from "../../helper/initGit.js";
 import ProjectBaseSetup from "./base_setup.js";
-import sleep from "../../util/sleep.js";
 import fs from "fs-extra";
 
 /**
@@ -165,6 +159,31 @@ class SetupBackend extends ProjectBaseSetup {
         cleanProjectName,
         to
       );
+    } catch (e: any) {
+      logger.error(e);
+    }
+  }
+
+  public async isNextjs(promptInput: ProjectOptions) {
+    const {
+      projectName,
+      backendDatabase,
+      stack,
+      variant,
+      backendDatabaseType,
+    } = promptInput;
+    const templatePath =
+      variant.toLowerCase() === Variant.JS
+        ? `/js_support/node_exp/`
+        : `/ts_support/node_exp/`;
+    const nodeExpDir = path.join("./", SERVER_TEMPLATE_DIR, templatePath);
+    const cleanProjectName = cleanUpProjectName(projectName);
+    const dest_path = getCwd();
+
+    if (cleanProjectName !== ".") {
+      await createFolder(cleanProjectName, dest_path);
+    }
+    try {
     } catch (e: any) {
       logger.error(e);
     }
