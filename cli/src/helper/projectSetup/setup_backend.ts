@@ -69,9 +69,11 @@ class SetupBackend extends ProjectBaseSetup {
 
     switch (`${backendPreset.toLowerCase()}`) {
       case "nodejs/express":
-        return this.isNodejsAndExpress(promptInput);
+        this.isNodejsAndExpress(promptInput);
+        break;
       case "nextjs":
-        return this.isNextjs(promptInput);
+        this.isNextjs(promptInput);
+        break;
       default:
         console.log("Failed to determine backend preset");
     }
