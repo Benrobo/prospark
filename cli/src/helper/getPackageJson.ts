@@ -20,6 +20,7 @@ export interface ReturnPackageJson {
   devDependencies: {
     [key: string]: string;
   };
+  prisma?: object;
 }
 
 function getPackageJsonData(): ReturnPackageJson {

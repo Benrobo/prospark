@@ -73,8 +73,8 @@ const prisma = new PrismaClient();
 module.exports = prisma;
 `;
 
-export const NodeExp_MongoDb_DB_ENV_PROP = `mongoUrl: process.env.NODE_ENV === "development" ? LOCAL_DB_CONN : process.env.MONGODB`;
-export const NodeExp_ENV = `
+export const MongoDB_ENV_PROP = `mongoUrl: process.env.NODE_ENV === "development" ? LOCAL_DB_CONN : process.env.MONGODB`;
+export const ENV_CONTENT = `
 const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
 
@@ -111,7 +111,7 @@ model Users {
 }
 `;
 
-export const NodeExp_ENV_CONT = `
+export const ENV_CONTENT_CONT = `
 {{DB_URL}}
 
 NODE_ENV="development"

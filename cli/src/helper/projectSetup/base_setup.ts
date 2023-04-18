@@ -28,9 +28,9 @@ import getPkgVersion from "../../helper/getPkgVersion.js";
 import { SCRIPT_TITLE } from "../../config/index.js";
 import {
   NodeExp_APP_JS,
-  NodeExp_ENV,
-  NodeExp_ENV_CONT,
-  NodeExp_MongoDb_DB_ENV_PROP,
+  ENV_CONTENT,
+  ENV_CONTENT_CONT,
+  MongoDB_ENV_PROP,
   PRISMA_SCHEMA,
 } from "../../data/backend_templates.js";
 
@@ -271,6 +271,8 @@ class ProjectBaseSetup {
           delete pkgJsonData.devDependencies["@prisma/client"];
           delete pkgJsonData.devDependencies["prisma"];
           delete pkgJsonData.scripts["migrate:prisma"];
+          // * nextjs prisma section
+          delete pkgJsonData.prisma;
         }
       }
 
@@ -279,6 +281,7 @@ class ProjectBaseSetup {
         delete pkgJsonData.scripts["migrate:prisma"];
         delete pkgJsonData.dependencies["@prisma/client"];
         delete pkgJsonData.devDependencies["@prisma/client"];
+        delete pkgJsonData.prisma;
       }
 
       pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
@@ -524,7 +527,6 @@ class ProjectBaseSetup {
     shouldUseDB: boolean,
     dest_path: string
   ) {
-    const {} = promptInput;
     const mainDir = `${dest_path}`;
     const fileExt = this.getBackendFileExt(promptInput);
 
@@ -541,7 +543,7 @@ class ProjectBaseSetup {
       removeFile(mainDir + `/src/config`, `prisma.${fileExt}`);
 
       // * create .env file
-      envContent = NodeExp_ENV_CONT.replace("{{DB_URL}}", "");
+      envContent = ENV_CONTENT_CONT.replace("{{DB_URL}}", "");
       createFile(dest_path, ".env", envContent);
     }
 
@@ -557,7 +559,7 @@ class ProjectBaseSetup {
             localConnUrl = `const LOCAL_DB_CONN = "mongodb://localhost:27020/prospark-db";`;
 
           //* create .env file
-          envContent = NodeExp_ENV_CONT.replace(
+          envContent = ENV_CONTENT_CONT.replace(
             "{{DB_URL}}",
             "MONGODB='mongodb://localhost:27020/prospark-db'"
           );
@@ -569,10 +571,10 @@ class ProjectBaseSetup {
             dbConnMethodImport
           ).replace("{{init_db_func_call}}", connMethodCall);
 
-          const updatedEnv = NodeExp_ENV.replace(
+          const updatedEnv = ENV_CONTENT.replace(
             "{{LOCAL_CONN_URL}}",
             localConnUrl
-          ).replace("{{DB_ENV_PROP}}", NodeExp_MongoDb_DB_ENV_PROP);
+          ).replace("{{DB_ENV_PROP}}", MongoDB_ENV_PROP);
 
           await updateFileContent(appJs, updatedAppjs);
           await updateFileContent(envJs, updatedEnv);
@@ -593,7 +595,7 @@ class ProjectBaseSetup {
             DBType.toLowerCase() === "mysql"
               ? "DATABASE_URL='mysql://root:@localhost:3306/prospark-db'"
               : "DATABASE_URL='postgresql://root:@localhost:5432/prospark-db'";
-          envContent = NodeExp_ENV_CONT.replace("{{DB_URL}}", DB_URL);
+          envContent = ENV_CONTENT_CONT.replace("{{DB_URL}}", DB_URL);
           createFile(dest_path, ".env", envContent);
 
           // * update prisma configs.

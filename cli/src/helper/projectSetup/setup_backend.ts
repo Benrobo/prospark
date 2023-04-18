@@ -73,8 +73,10 @@ class SetupBackend extends ProjectBaseSetup {
     switch (`${backendPreset.toLowerCase()}`) {
       case "nodejs/express":
         return this.isNodejsAndExpress(promptInput);
-      case "vanilla-css module":
-      // code to handle other cases or an error
+      case "nextjs":
+        return this.isNextjs(promptInput);
+      default:
+        console.log("Failed to determine backend preset");
     }
   }
 
@@ -176,7 +178,7 @@ class SetupBackend extends ProjectBaseSetup {
       variant.toLowerCase() === Variant.JS
         ? `/js_support/nextjs/`
         : `/ts_support/nextjs/`;
-    const nodeExpDir = path.join("./", SERVER_TEMPLATE_DIR, templatePath);
+    const nextjsDir = path.join("./", SERVER_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
 
@@ -184,6 +186,25 @@ class SetupBackend extends ProjectBaseSetup {
       await createFolder(cleanProjectName, dest_path);
     }
     try {
+      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const from = nextjsDir;
+      const to = projDirPath;
+      const newPkgJsonPath = `${to}/package.json`;
+      const shouldUseDB =
+        typeof backendDatabase !== "undefined" ? backendDatabase : false;
+      const DBType =
+        typeof backendDatabaseType !== "undefined" ? backendDatabaseType : null;
+
+      await copyDirectoryToDestination(from, to);
+
+      const pkgJsonData = (await this.configureNodeExpPkgJson(
+        newPkgJsonPath,
+        projectName,
+        shouldUseDB,
+        DBType
+      )) as ReturnPackageJson;
+
+      console.log(pkgJsonData);
     } catch (e: any) {
       logger.error(e);
     }
