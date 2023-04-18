@@ -37,7 +37,7 @@ class App {
     this.initDB();
     // listen on server port
     this.app.listen(this.port, () => {
-      logger.info(`Server started at http://localhost:${this.port}`);
+      logger.info("Server started at http://localhost:" + this.port);
     });
   }
 
@@ -47,14 +47,14 @@ class App {
       this.app.use("/api", route.router);
     });
 
-    // this.app.all("*", (req, res) => {
-    //   return res.status(404).json({
-    //     errorStatus: true,
-    //     code: "--route/route-not-found",
-    //     message: `The requested route was not found.`,
-    //   });
-    // });
-    // // handle global errors
+    this.app.all("*", (req, res) => {
+      return res.status(404).json({
+        errorStatus: true,
+        code: "--route/route-not-found",
+        message: "The requested route was not found.",
+      });
+    });
+    // handle global errors
     this.app.use(HandleErrors);
   }
 }
