@@ -1,10 +1,7 @@
-import { SERVER_TEMPLATE_DIR, SCRIPT_TITLE } from "../../config/index.js";
+import { SERVER_TEMPLATE_DIR } from "../../config/index.js";
 import ProjectOptions from "../../@types/project.js";
 import path from "path";
-import {
-  ReturnPackageJson,
-  getPackageJsonDataFromPath,
-} from "../../helper/getPackageJson.js";
+import { ReturnPackageJson } from "../../helper/getPackageJson.js";
 import getCwd from "../../util/getCwd.js";
 import {
   copyDirectoryToDestination,

@@ -594,6 +594,11 @@ class ProjectBaseSetup {
               "{{LOCAL_CONN_URL}}",
               localConnUrl
             ).replace("{{DB_ENV_PROP}}", MongoDB_ENV_PROP);
+
+            envContent = ENV_CONTENT_CONT.replace("{{DB_URL}}", "");
+            createFile(dest_path, ".env.local", envContent);
+            createFile(dest_path, ".env", "");
+
             await updateFileContent(envJs, updatedEnv);
             return;
           }
