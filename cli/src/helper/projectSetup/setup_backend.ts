@@ -11,6 +11,7 @@ import {
   createFile,
   createFolder,
   readFileData,
+  removeFile,
   updateFileContent,
 } from "../../helper/file-manager.js";
 import pretty from "pretty";
@@ -38,7 +39,7 @@ import fs from "fs-extra";
   architecture: 'Poly-repo',
   stack: 'backend',
   variant: 'Javascript',
-  backendRestWithJavascript: 'Nodejs/Express',
+  backendPreset: 'Nodejs/Express',
   backendDatabase: true,
   backendDatabaseType: 'Mysql'
 }
@@ -60,47 +61,12 @@ class SetupBackend extends ProjectBaseSetup {
       this.handleTypescriptSetup(promptInput);
   }
 
-  protected async configureNodeExp(path: string) {
+  protected async cleanUpNonDbFilesConfig(path: string) {
     if (!fs.pathExistsSync(path)) return;
 
     const Loader = await showLoading();
 
     try {
-      // files and file content
-      let postcssFilename = `postcss.config.cjs`,
-        postcssCont = {
-          plugins: {
-            tailwindcss: {},
-            autoprefixer: {},
-          },
-        },
-        tailwindFilename = `tailwind.config.cjs`,
-        tailwindCont = {
-          content: ["./index.html", "./src/**/*.{html,js,jsx,ts,tsx}"],
-          theme: {
-            extend: {},
-          },
-          plugins: [],
-        },
-        indexCssname = `index.css`,
-        indexCssCont = `
-            @tailwind base;
-            @tailwind components;
-            @tailwind utilities;
-            `.replace(/^\s+/gm, "");
-
-      Loader.start("setting up tailwindcss...");
-      createFile(
-        path,
-        postcssFilename,
-        `module.exports=${JSON.stringify(postcssCont, null, 2)}`
-      );
-      createFile(
-        path,
-        tailwindFilename,
-        `module.exports=${JSON.stringify(tailwindCont, null, 2)}`
-      );
-      createFile(path + "/src", indexCssname, indexCssCont);
       Loader.stop("tailwindcss successfully setup.", null);
     } catch (e: any) {
       logger.error(e);
@@ -166,6 +132,15 @@ class SetupBackend extends ProjectBaseSetup {
 
       if (pkgJsonData === null && Object.entries(pkgJsonData).length === 0)
         return;
+
+      await this.updateBackendTemplateFiles(
+        promptInput,
+        DBType as string,
+        shouldUseDB,
+        to
+      );
+
+      console.log("Done..");
     } catch (e: any) {
       logger.error(e);
     }
