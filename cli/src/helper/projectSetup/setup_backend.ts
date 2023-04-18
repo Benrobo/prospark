@@ -204,7 +204,41 @@ class SetupBackend extends ProjectBaseSetup {
         DBType
       )) as ReturnPackageJson;
 
-      console.log(pkgJsonData);
+      if (pkgJsonData === null && Object.entries(pkgJsonData).length === 0)
+        return;
+
+      await this.updateBackendTemplateFiles(
+        promptInput,
+        DBType as string,
+        shouldUseDB,
+        to
+      );
+
+      await updateFileContent(
+        newPkgJsonPath,
+        JSON.stringify(pkgJsonData, null, 2)
+      );
+
+      const shouldInstall = await this.askDependenciesInstalled();
+      let hasInstalled = false;
+
+      if (shouldInstall) {
+        await installDepInPkgJson(to);
+        hasInstalled = true;
+      }
+
+      const shouldInitializeGit = await this.askForGitInit();
+
+      if (shouldInitializeGit) {
+        await initializeGit(to);
+      }
+
+      this.showWelcomeMessage(
+        vanillSetupMessage,
+        hasInstalled,
+        cleanProjectName,
+        to
+      );
     } catch (e: any) {
       logger.error(e);
     }
