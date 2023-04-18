@@ -32,6 +32,7 @@ import {
   ENV_CONTENT_CONT,
   MongoDB_ENV_PROP,
   PRISMA_SCHEMA,
+  NEXT_ENV_CONTENT,
 } from "../../data/backend_templates.js";
 
 class ProjectBaseSetup {
@@ -83,6 +84,12 @@ class ProjectBaseSetup {
         break;
       case "nodejs/express-typescript":
         fileExt = "ts";
+        break;
+      case "nextjs-typescript":
+        fileExt = "ts";
+        break;
+      case "nextjs-javascript":
+        fileExt = "js";
         break;
       default:
         logger.error(`invalid framework and variant `);
@@ -530,14 +537,25 @@ class ProjectBaseSetup {
     shouldUseDB: boolean,
     dest_path: string
   ) {
+    const { backendPreset } = promptInput;
+    const backendFramework = backendPreset?.toLowerCase();
     const mainDir = `${dest_path}`;
     const fileExt = this.getBackendFileExt(promptInput);
 
     // * Files to be updated / deleted.
-    const prismaFolder = mainDir + `/prisma`;
+    const prismaFolder =
+      backendFramework === "nodejs/express"
+        ? `${mainDir}/prisma`
+        : `${mainDir}/pages/api/prisma`;
     const appJs = mainDir + `/src/app.${fileExt}`,
-      prismaSchema = mainDir + `/prisma/schema.prisma`,
-      envJs = mainDir + `/src/config/env.${fileExt}`;
+      prismaSchema =
+        backendFramework === "nodejs/express"
+          ? mainDir + `/prisma/schema.prisma`
+          : mainDir + `/pages/api/prisma/schema.prisma`,
+      envJs =
+        backendFramework === "nodejs/express"
+          ? mainDir + `/src/config/env.${fileExt}`
+          : `${mainDir}/pages/api/config/env.${fileExt}`;
 
     let envContent = "";
 
@@ -548,11 +566,38 @@ class ProjectBaseSetup {
       // * create .env file
       envContent = ENV_CONTENT_CONT.replace("{{DB_URL}}", "");
       createFile(dest_path, ".env", envContent);
+
+      // handle nextjs
+      if (backendFramework === "nextjs") {
+        removeFile(mainDir + `/pages/api/config`, `mongodb.${fileExt}`);
+        removeFile(mainDir + `/pages/api/config`, `prisma.${fileExt}`);
+
+        // * create .env and .env.local file
+        envContent = ENV_CONTENT_CONT.replace("{{DB_URL}}", "");
+        createFile(dest_path, ".env", envContent);
+        createFile(dest_path, ".env.local", envContent);
+      }
     }
 
     if (shouldUseDB) {
       if (DBType.toLowerCase() === "mongodb") {
         try {
+          // handle nextjs
+          if (backendFramework === "nextjs") {
+            const localConnUrl = `const LOCAL_DB_CONN = "mongodb://localhost:27020/prospark-db";`;
+
+            removeFile(mainDir + `/pages/api/config`, `prisma.${fileExt}`);
+            removeFile(mainDir, ".env");
+            emptyDirectory(prismaFolder);
+
+            const updatedEnv = NEXT_ENV_CONTENT.replace(
+              "{{LOCAL_CONN_URL}}",
+              localConnUrl
+            ).replace("{{DB_ENV_PROP}}", MongoDB_ENV_PROP);
+            await updateFileContent(envJs, updatedEnv);
+            return;
+          }
+
           // * remove prisma config file first
           removeFile(mainDir + `/src/config`, `prisma.${fileExt}`);
           emptyDirectory(prismaFolder);
@@ -590,10 +635,36 @@ class ProjectBaseSetup {
         DBType.toLowerCase() === "postgresql"
       ) {
         try {
-          // * remove mongodb config file first
+          // handle nextjs
+          if (backendFramework === "nextjs") {
+            const DB_URL =
+              DBType.toLowerCase() === "mysql"
+                ? "DATABASE_URL='mysql://root:@localhost:3306/prospark-db'"
+                : "DATABASE_URL='postgresql://root:@localhost:5432/prospark-db'";
+
+            envContent = ENV_CONTENT_CONT.replace("{{DB_URL}}", "");
+            createFile(dest_path, ".env.local", envContent);
+            createFile(dest_path, ".env", DB_URL);
+
+            // * update prisma configs.
+            const prismaProvider = `provider     = "${DBType.toLowerCase()}"`,
+              prismaRelationMode =
+                DBType.toLowerCase() === "mysql"
+                  ? `relationMode = "prisma"`
+                  : "";
+
+            // * update connection db method and env props
+            const updatedPrismajs = PRISMA_SCHEMA.replace(
+              "{{provider}}",
+              prismaProvider
+            ).replace("{{relationMode}}", prismaRelationMode);
+
+            await updateFileContent(prismaSchema, updatedPrismajs);
+            return;
+          }
+
           removeFile(mainDir + `/src/config`, `mongodb.${fileExt}`);
 
-          //* create .env file
           const DB_URL =
             DBType.toLowerCase() === "mysql"
               ? "DATABASE_URL='mysql://root:@localhost:3306/prospark-db'"
