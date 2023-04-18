@@ -174,8 +174,8 @@ class SetupBackend extends ProjectBaseSetup {
     } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
-        ? `/js_support/node_exp/`
-        : `/ts_support/node_exp/`;
+        ? `/js_support/nextjs/`
+        : `/ts_support/nextjs/`;
     const nodeExpDir = path.join("./", SERVER_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
