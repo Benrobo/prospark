@@ -110,3 +110,11 @@ model Users {
     email           String   @unique
 }
 `;
+
+export const NodeExp_ENV_CONT = `
+{{DB_URL}}
+
+NODE_ENV="development"
+
+JWT_SECRET="sdcsdcdc32ry38y9dpnp23i3892te832tp9e23on"
+`;

@@ -29,6 +29,7 @@ import { SCRIPT_TITLE } from "../../config/index.js";
 import {
   NodeExp_APP_JS,
   NodeExp_ENV,
+  NodeExp_ENV_CONT,
   NodeExp_MongoDb_DB_ENV_PROP,
   PRISMA_SCHEMA,
 } from "../../data/backend_templates.js";
@@ -529,10 +530,15 @@ class ProjectBaseSetup {
       prismaSchema = mainDir + `/prisma/schema.prisma`,
       envJs = mainDir + `/src/config/env.${fileExt}`;
 
+    let envContent = "";
+
     if (!shouldUseDB) {
       // remove every db config file.
       removeFile(mainDir + `/src/config`, `mongodb.${fileExt}`);
       removeFile(mainDir + `/src/config`, `prisma.${fileExt}`);
+      // * create .env file
+      envContent = NodeExp_ENV_CONT.replace("{{DB_URL}}", "");
+      createFile(dest_path, ".env", envContent);
     }
 
     if (shouldUseDB) {
@@ -545,6 +551,13 @@ class ProjectBaseSetup {
           const dbConnMethodImport = `const connectMongodb = require("./config/mongodb.js")`,
             connMethodCall = `connectMongodb(ENV.mongoUrl)`,
             localConnUrl = `const LOCAL_DB_CONN = "mongodb://localhost:27020/prospark-db";`;
+
+          //* create .env file
+          envContent = NodeExp_ENV_CONT.replace(
+            "{{DB_URL}}",
+            "mongodb://localhost:27020/prospark-db"
+          );
+          createFile(dest_path, ".env", envContent);
 
           // * update connection db method and env props
           const updatedAppjs = NodeExp_APP_JS.replace(
@@ -570,6 +583,14 @@ class ProjectBaseSetup {
         try {
           // * remove mongodb config file first
           removeFile(mainDir + `/src/config`, `mongodb.${fileExt}`);
+
+          //* create .env file
+          const DB_URL =
+            DBType.toLowerCase() === "mysql"
+              ? "DATABASE_URL='mysql://root:@localhost:3306/prospark-db'"
+              : "DATABASE_URL='postgresql://root:@localhost:5432/prospark-db'";
+          envContent = NodeExp_ENV_CONT.replace("{{DB_URL}}", DB_URL);
+          createFile(dest_path, ".env", envContent);
 
           const prismaProvider = `provider     = "${DBType.toLowerCase()}"`,
             prismaRelationMode =
