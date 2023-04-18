@@ -15,6 +15,8 @@ import {
   createFolder,
   createFile,
   updateFileContent,
+  removeFile,
+  emptyDirectory,
 } from "../../helper/file-manager.js";
 import pretty from "pretty";
 import logger from "../../util/logger.js";
@@ -24,11 +26,17 @@ import {
 } from "../../helper/getPackageJson.js";
 import getPkgVersion from "../../helper/getPkgVersion.js";
 import { SCRIPT_TITLE } from "../../config/index.js";
+import {
+  NodeExp_APP_JS,
+  NodeExp_ENV,
+  NodeExp_MongoDb_DB_ENV_PROP,
+  PRISMA_SCHEMA,
+} from "../../data/backend_templates.js";
 
 class ProjectBaseSetup {
   protected scaffoldDesc = "Scaffolded using prospark";
 
-  protected getIndexScriptExt(promptInput: ProjectOptions) {
+  protected getFrontendFileExt(promptInput: ProjectOptions) {
     const { frontendFramework, variant } = promptInput;
     const combo = `${frontendFramework}-${variant}`.toLowerCase();
     let fileExt = "";
@@ -55,6 +63,24 @@ class ProjectBaseSetup {
         fileExt = "js";
         break;
       case "vanilla-typescript":
+        fileExt = "ts";
+        break;
+      default:
+        logger.error(`invalid framework and variant `);
+        break;
+    }
+    return fileExt;
+  }
+
+  protected getBackendFileExt(promptInput: ProjectOptions) {
+    const { backendPreset, variant } = promptInput;
+    const combo = `${backendPreset}-${variant}`.toLowerCase();
+    let fileExt = "";
+    switch (combo) {
+      case "nodejs/express-javascript":
+        fileExt = "js";
+        break;
+      case "nodejs/express-typescript":
         fileExt = "ts";
         break;
       default:
@@ -306,7 +332,7 @@ class ProjectBaseSetup {
   ) {
     const { frontendFramework, variant, frontendStyling } = promptInput;
     const mainDir = `${dest_path}`;
-    const fileExt = this.getIndexScriptExt(promptInput);
+    const fileExt = this.getFrontendFileExt(promptInput);
     const appJsx = mainDir + `/src/App.${fileExt}`,
       nextIndexJs = mainDir + `/pages/index.${fileExt}`,
       htmlFile = mainDir + `/index.html`,
@@ -482,6 +508,83 @@ class ProjectBaseSetup {
         }
       } catch (e: any) {
         logger.error(e);
+      }
+    }
+  }
+
+  public async updateBackendTemplateFiles(
+    promptInput: ProjectOptions,
+    DBType: string,
+    shouldUseDB: boolean,
+    dest_path: string
+  ) {
+    const {} = promptInput;
+    const mainDir = `${dest_path}`;
+    const fileExt = this.getBackendFileExt(promptInput);
+
+    // * Files to be updated / deleted.
+    const prismaFolder = mainDir + `/prisma`;
+    const appJs = mainDir + `/src/app.${fileExt}`,
+      mongodbJs = mainDir + `/src/config/mongodb.${fileExt}`,
+      prismaSchema = mainDir + `/prisma/schema.prisma`,
+      envJs = mainDir + `/src/config/env.${fileExt}`;
+
+    if (!shouldUseDB) {
+      // remove every db config file.
+      removeFile(mainDir + `/src/config`, `mongodb.${fileExt}`);
+      removeFile(mainDir + `/src/config`, `prisma.${fileExt}`);
+    }
+
+    if (shouldUseDB) {
+      if (DBType.toLowerCase() === "mongodb") {
+        try {
+          // * remove prisma config file first
+          removeFile(mainDir + `/src/config`, `prisma.${fileExt}`);
+          emptyDirectory(prismaFolder);
+
+          const dbConnMethodImport = `const connectMongodb = require("./config/mongodb.js")`,
+            connMethodCall = `connectMongodb(ENV.mongoUrl)`,
+            localConnUrl = `const LOCAL_DB_CONN = "mongodb://localhost:27020/prospark-db";`;
+
+          // * update connection db method and env props
+          const updatedAppjs = NodeExp_APP_JS.replace(
+            "{{db_conn_method_import}}",
+            dbConnMethodImport
+          ).replace("{{init_db_func_call}}", connMethodCall);
+
+          const updatedEnv = NodeExp_ENV.replace(
+            "{{LOCAL_CONN_URL}}",
+            localConnUrl
+          ).replace("{{DB_ENV_PROP}}", NodeExp_MongoDb_DB_ENV_PROP);
+
+          await updateFileContent(appJs, updatedAppjs);
+          await updateFileContent(envJs, updatedEnv);
+        } catch (e) {
+          logger.error(e);
+        }
+      }
+      if (
+        DBType.toLowerCase() === "mysql" ||
+        DBType.toLowerCase() === "postgresql"
+      ) {
+        try {
+          // * remove mongodb config file first
+          removeFile(mainDir + `/src/config`, `mongodb.${fileExt}`);
+
+          const prismaProvider = `provider     = "${DBType.toLowerCase()}"`,
+            prismaRelationMode =
+              DBType.toLowerCase() === "mysql" ? `relationMode = "prisma"` : "";
+
+          // * update connection db method and env props
+          const updatedPrismajs = PRISMA_SCHEMA.replace(
+            "{{provider}}",
+            prismaProvider
+          ).replace("{{relationMode}}", prismaRelationMode);
+
+          await updateFileContent(prismaSchema, updatedPrismajs);
+        } catch (e) {
+          logger.error(e);
+        }
       }
     }
   }
