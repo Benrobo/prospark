@@ -272,7 +272,8 @@ class ProjectBaseSetup {
           delete pkgJsonData.devDependencies["prisma"];
           delete pkgJsonData.scripts["migrate:prisma"];
           // * nextjs prisma section
-          delete pkgJsonData.prisma;
+          if (typeof pkgJsonData?.prisma !== "undefined")
+            delete pkgJsonData.prisma;
         }
       }
 
