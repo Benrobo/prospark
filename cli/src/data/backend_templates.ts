@@ -95,18 +95,18 @@ module.exports = ENV;
 export const PRISMA_SCHEMA = `
 generator client {
     provider = "prisma-client-js"
-  }
-  
-  datasource db {
+}
+
+datasource db {
     {{provider}}
     url          = env("DATABASE_URL")
     {{relationMode}}
-  }
+}
   
-  model Users {
+model Users {
     id              String   @id
     emailVerified   Boolean? @default(false)
     accountVerified Boolean? @default(false)
     email           String   @unique
-  }
+}
 `;
