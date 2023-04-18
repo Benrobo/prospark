@@ -140,7 +140,31 @@ class SetupBackend extends ProjectBaseSetup {
         to
       );
 
-      console.log("Done..");
+      await updateFileContent(
+        newPkgJsonPath,
+        JSON.stringify(pkgJsonData, null, 2)
+      );
+
+      const shouldInstall = await this.askDependenciesInstalled();
+      let hasInstalled = false;
+
+      if (shouldInstall) {
+        await installDepInPkgJson(to);
+        hasInstalled = true;
+      }
+
+      const shouldInitializeGit = await this.askForGitInit();
+
+      if (shouldInitializeGit) {
+        await initializeGit(to);
+      }
+
+      this.showWelcomeMessage(
+        vanillSetupMessage,
+        hasInstalled,
+        cleanProjectName,
+        to
+      );
     } catch (e: any) {
       logger.error(e);
     }
