@@ -533,9 +533,10 @@ class ProjectBaseSetup {
     let envContent = "";
 
     if (!shouldUseDB) {
-      // remove every db config file.
+      //! remove every db config file.
       removeFile(mainDir + `/src/config`, `mongodb.${fileExt}`);
       removeFile(mainDir + `/src/config`, `prisma.${fileExt}`);
+
       // * create .env file
       envContent = NodeExp_ENV_CONT.replace("{{DB_URL}}", "");
       createFile(dest_path, ".env", envContent);
@@ -592,6 +593,7 @@ class ProjectBaseSetup {
           envContent = NodeExp_ENV_CONT.replace("{{DB_URL}}", DB_URL);
           createFile(dest_path, ".env", envContent);
 
+          // * update prisma configs.
           const prismaProvider = `provider     = "${DBType.toLowerCase()}"`,
             prismaRelationMode =
               DBType.toLowerCase() === "mysql" ? `relationMode = "prisma"` : "";
