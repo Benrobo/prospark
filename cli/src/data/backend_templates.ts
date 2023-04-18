@@ -92,6 +92,21 @@ const ENV = {
 module.exports = ENV;
 `;
 
+export const NEXT_ENV_CONTENT = `
+{{LOCAL_CONN_URL}}
+
+const ENV = {
+  jwtSecret: process.env.JWT_SECRET,
+  {{DB_ENV_PROP}},
+  clientUrl:
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://paycode.co",
+};
+
+export default ENV;
+`;
+
 export const PRISMA_SCHEMA = `
 generator client {
     provider = "prisma-client-js"
