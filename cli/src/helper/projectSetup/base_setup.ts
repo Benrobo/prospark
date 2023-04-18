@@ -277,11 +277,13 @@ class ProjectBaseSetup {
       }
 
       if (shouldUseDB && databaseType?.toLowerCase() === "mongodb") {
-        delete pkgJsonData.devDependencies["prisma"];
+        if (typeof pkgJsonData.devDependencies?.prisma !== "undefined")
+          delete pkgJsonData.devDependencies?.prisma;
+        if (typeof pkgJsonData?.prisma !== "undefined")
+          delete pkgJsonData?.prisma;
         delete pkgJsonData.scripts["migrate:prisma"];
         delete pkgJsonData.dependencies["@prisma/client"];
-        delete pkgJsonData.devDependencies["@prisma/client"];
-        delete pkgJsonData.prisma;
+        delete pkgJsonData.dependencies["prisma"];
       }
 
       pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
