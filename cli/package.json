@@ -1,6 +1,6 @@
 {
   "name": "create-prospark-app",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "Easily scaffold a new project with prefered technologies",
   "main": "./dist/index.js",
   "type": "module",
@@ -19,7 +19,8 @@
     "nextjs",
     "cli"
   ],
-  "author": "",
+  "exports": "./dist/index.js",
+  "author": "Benrobo",
   "license": "ISC",
   "dependencies": {
     "chalk": "5.0.1",
@@ -51,6 +52,6 @@
     "vite": "^4.0.3"
   },
   "bin": {
-    "create-prospark-app": "node ./dist/index.js"
+    "create-prospark-app": "./dist/index.js"
   }
 }
