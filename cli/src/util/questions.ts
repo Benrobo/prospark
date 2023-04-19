@@ -22,19 +22,19 @@ const scaffoldQuestions = [
   //         'SAAS',
   //     ]
   // }, // COMING SOON
-  {
-    type: "list",
-    name: "architecture",
-    message: "Select an architecture:",
-    prefix: chalk.greenBright("\n?"),
-    choices: ["Poly-repo", "Mono-repo"],
-  },
+  // {
+  //   type: "list",
+  //   name: "architecture",
+  //   message: "Select an architecture:",
+  //   prefix: chalk.greenBright("\n?"),
+  //   choices: ["Poly-repo", "Mono-repo"],
+  // },
   {
     type: "list",
     name: "stack",
     message: "Select stack:",
     prefix: chalk.greenBright("\n?"),
-    choices: ["frontend", "backend", "fullstack"],
+    choices: ["frontend", "backend"],
   },
   {
     type: "list",

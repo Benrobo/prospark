@@ -20,6 +20,7 @@ import { vanillSetupMessage } from "../../const/index.js";
 import initializeGit from "../../helper/initGit.js";
 import ProjectBaseSetup from "./base_setup.js";
 import fs from "fs-extra";
+import InitializeMonorepo from "../initializeMonorepo.js";
 
 /**
  * 
@@ -107,7 +108,13 @@ class SetupBackend extends ProjectBaseSetup {
       await createFolder(cleanProjectName, dest_path);
     }
     try {
-      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const finalProjPath = await new InitializeMonorepo().yarnWorkspace(
+        projectName,
+        dest_path + `/${cleanProjectName}`,
+        stack
+      );
+      const projType = stack === "backend" ? "api" : "app";
+      const projDirPath = `${finalProjPath}/${projType}`;
       const from = nodeExpDir;
       const to = projDirPath;
       const newPkgJsonPath = `${to}/package.json`;
@@ -185,7 +192,13 @@ class SetupBackend extends ProjectBaseSetup {
       await createFolder(cleanProjectName, dest_path);
     }
     try {
-      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const finalProjPath = await new InitializeMonorepo().yarnWorkspace(
+        projectName,
+        dest_path + `/${cleanProjectName}`,
+        stack
+      );
+      const projType = stack === "backend" ? "api" : "app";
+      const projDirPath = `${finalProjPath}/${projType}`;
       const from = nextjsDir;
       const to = projDirPath;
       const newPkgJsonPath = `${to}/package.json`;

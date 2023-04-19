@@ -29,6 +29,7 @@ import initializeGit from "../../helper/initGit.js";
 import ProjectBaseSetup from "./base_setup.js";
 import sleep from "../../util/sleep.js";
 import fs from "fs-extra";
+import InitializeMonorepo from "../initializeMonorepo.js";
 
 /**
  * 
@@ -52,6 +53,7 @@ enum Variant {
 
 class SetupFrontend extends ProjectBaseSetup {
   protected variant;
+  protected initMonorepo;
   public constructor(promptInput: ProjectOptions) {
     super();
     this.variant = promptInput.variant;
@@ -59,6 +61,7 @@ class SetupFrontend extends ProjectBaseSetup {
       this.handleJavascriptSetup(promptInput);
     this.variant.toLowerCase() === "typescript" &&
       this.handleTypescriptSetup(promptInput);
+    this.initMonorepo = new InitializeMonorepo();
   }
 
   protected async configureReactTailwindCss(path: string) {
@@ -521,7 +524,13 @@ class SetupFrontend extends ProjectBaseSetup {
     }
 
     try {
-      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const finalProjPath = await new InitializeMonorepo().yarnWorkspace(
+        projectName,
+        dest_path + `/${cleanProjectName}`,
+        stack
+      );
+      const projType = stack === "backend" ? "api" : "app";
+      const projDirPath = `${finalProjPath}/${projType}`;
       const from = reactDir;
       const to = projDirPath;
       const newPkgJsonPath = `${to}/package.json`;
@@ -571,15 +580,7 @@ class SetupFrontend extends ProjectBaseSetup {
   }
 
   protected async isReactAndCssModule(promptInput: ProjectOptions) {
-    const {
-      projectName,
-      projectType,
-      architecture,
-      stack,
-      variant,
-      frontendFramework,
-      frontendStyling,
-    } = promptInput;
+    const { projectName, stack, variant, frontendStyling } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
         ? `/js_support/react/`
@@ -593,7 +594,13 @@ class SetupFrontend extends ProjectBaseSetup {
     }
 
     try {
-      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const finalProjPath = await new InitializeMonorepo().yarnWorkspace(
+        projectName,
+        dest_path + `/${cleanProjectName}`,
+        stack
+      );
+      const projType = stack === "backend" ? "api" : "app";
+      const projDirPath = `${finalProjPath}/${projType}`;
       const from = reactDir;
       const to = projDirPath;
       const newPkgJsonPath = `${to}/package.json`;
@@ -641,15 +648,7 @@ class SetupFrontend extends ProjectBaseSetup {
   }
 
   protected async isSvelteAndTailwindCss(promptInput: ProjectOptions) {
-    const {
-      projectName,
-      projectType,
-      architecture,
-      stack,
-      variant,
-      frontendFramework,
-      frontendStyling,
-    } = promptInput;
+    const { projectName, stack, variant, frontendStyling } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
         ? `/js_support/svelte/`
@@ -663,7 +662,13 @@ class SetupFrontend extends ProjectBaseSetup {
     }
 
     try {
-      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const finalProjPath = await new InitializeMonorepo().yarnWorkspace(
+        projectName,
+        dest_path + `/${cleanProjectName}`,
+        stack
+      );
+      const projType = stack === "backend" ? "api" : "app";
+      const projDirPath = `${finalProjPath}/${projType}`;
       const from = reactDir;
       const to = projDirPath;
       const newPkgJsonPath = `${to}/package.json`;
@@ -713,15 +718,7 @@ class SetupFrontend extends ProjectBaseSetup {
   }
 
   protected async isSvelteAndCssModule(promptInput: ProjectOptions) {
-    const {
-      projectName,
-      projectType,
-      architecture,
-      stack,
-      variant,
-      frontendFramework,
-      frontendStyling,
-    } = promptInput;
+    const { projectName, stack, variant, frontendStyling } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
         ? `/js_support/svelte/`
@@ -735,7 +732,13 @@ class SetupFrontend extends ProjectBaseSetup {
     }
 
     try {
-      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const finalProjPath = await new InitializeMonorepo().yarnWorkspace(
+        projectName,
+        dest_path + `/${cleanProjectName}`,
+        stack
+      );
+      const projType = stack === "backend" ? "api" : "app";
+      const projDirPath = `${finalProjPath}/${projType}`;
       const from = reactDir;
       const to = projDirPath;
       const newPkgJsonPath = `${to}/package.json`;
@@ -783,15 +786,7 @@ class SetupFrontend extends ProjectBaseSetup {
   }
 
   protected async isNextjsAndTailwindcss(promptInput: ProjectOptions) {
-    const {
-      projectName,
-      projectType,
-      architecture,
-      stack,
-      variant,
-      frontendFramework,
-      frontendStyling,
-    } = promptInput;
+    const { projectName, stack, variant, frontendStyling } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
         ? `/js_support/nextjs/`
@@ -805,7 +800,13 @@ class SetupFrontend extends ProjectBaseSetup {
     }
 
     try {
-      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const finalProjPath = await new InitializeMonorepo().yarnWorkspace(
+        projectName,
+        dest_path + `/${cleanProjectName}`,
+        stack
+      );
+      const projType = stack === "backend" ? "api" : "app";
+      const projDirPath = `${finalProjPath}/${projType}`;
       const from = reactDir;
       const to = projDirPath;
       const newPkgJsonPath = `${to}/package.json`;
@@ -854,15 +855,7 @@ class SetupFrontend extends ProjectBaseSetup {
     }
   }
   protected async isNextjsAndCssModule(promptInput: ProjectOptions) {
-    const {
-      projectName,
-      projectType,
-      architecture,
-      stack,
-      variant,
-      frontendFramework,
-      frontendStyling,
-    } = promptInput;
+    const { projectName, stack, variant, frontendStyling } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
         ? `/js_support/nextjs/`
@@ -876,7 +869,13 @@ class SetupFrontend extends ProjectBaseSetup {
     }
 
     try {
-      const projDirPath = `${getCwd()}/${cleanProjectName}`;
+      const finalProjPath = await new InitializeMonorepo().yarnWorkspace(
+        projectName,
+        dest_path + `/${cleanProjectName}`,
+        stack
+      );
+      const projType = stack === "backend" ? "api" : "app";
+      const projDirPath = `${finalProjPath}/${projType}`;
       const from = reactDir;
       const to = projDirPath;
       const newPkgJsonPath = `${to}/package.json`;
