@@ -2,7 +2,7 @@
 
 create-prospark-app is a CLI tool that helps developers quickly and easily scaffold out their favorite technologies. The app is designed to appeal to developers who want a powerful and efficient tool for creating new projects and scaffolding out technologies.
 
-![prospark](https://raw.githubusercontent.com/Benrobo/prospark/main/markdown-assets/pp-cli.png?token=GHSAT0AAAAAAB73UFL64MWD6E6B66W65PMOZCAOEPQ)
+![prospark](https://github.com/Benrobo/prospark/blob/main/markdown-assets/pp-cli.png?raw=true)
 
 ## Installation 💿
 
