@@ -6,19 +6,11 @@ interface UseGradient {
   colors?: string[];
 }
 
-const poimandresTheme = {
-  blue: "#add7ff",
-  cyan: "#89ddff",
-  green: "#5de4c7",
-  magenta: "#fae4fc",
-  red: "#d0679d",
-  yellow: "#fffac2",
-};
-
 const color2 = {
-  red: "red",
-  blue: "blue",
-  cyan: "cyan",
+  red: "#FF0900",
+  orange: "#FF7F00",
+  yellow: "#FFEF00",
+  blue: "#0079FF",
 };
 
 const useGradinent = (opt: UseGradient): void => {

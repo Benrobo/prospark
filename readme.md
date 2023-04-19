@@ -39,26 +39,26 @@ To run a command, simply add it to the end of the create-prospark-app command. F
 #### Frontend ( Javascript / Typescript ) 🔥
 
 <p align="left">
-<a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/databases"><img src="https://img.shields.io/badge/REACT-green?style=for-the-badge&color=2196F3" /></a>&nbsp;
-<a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/databases"><img src="https://img.shields.io/badge/NextJS-dark?style=for-the-badge&color=607D8B" /></a>&nbsp;
-<a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/databases"><img src="https://img.shields.io/badge/Svelte-dark?style=for-the-badge&color=e53935" /></a>&nbsp;
-<a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/databases"><img src="https://img.shields.io/badge/VanillaJS-dark?style=for-the-badge&color=yellow" /></a>&nbsp;
+<a target="_blank" href="https://react.dev/"><img src="https://img.shields.io/badge/REACT-green?style=for-the-badge&color=2196F3" /></a>&nbsp;
+<a target="_blank" href="https://nextjs.org/"><img src="https://img.shields.io/badge/NextJS-dark?style=for-the-badge&color=607D8B" /></a>&nbsp;
+<a target="_blank" href="https://svelte.dev/"><img src="https://img.shields.io/badge/Svelte-dark?style=for-the-badge&color=e53935" /></a>&nbsp;
+<a target="_blank" href="https://developer.mozilla.org/en-US/"><img src="https://img.shields.io/badge/VanillaJS-dark?style=for-the-badge&color=yellow" /></a>&nbsp;
 </p>
 
 #### Backend ( Javascript / Typescript ) 🔐
 
 <p align="left">
-<a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/databases"><img src="https://img.shields.io/badge/Nodejs/Express-green?style=for-the-badge&color=00796B" /></a>&nbsp;
-<a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/databases"><img src="https://img.shields.io/badge/NextJS-dark?style=for-the-badge&color=607D8B" /></a>&nbsp;
+<a target="_blank" href="https://expressjs.com/"><img src="https://img.shields.io/badge/Nodejs/Express-green?style=for-the-badge&color=00796B" /></a>&nbsp;
+<a target="_blank" href="https://nextjs.org/docs/api-routes/introduction"><img src="https://img.shields.io/badge/NextJS-dark?style=for-the-badge&color=607D8B" /></a>&nbsp;
 </p>
 
 #### Databases ( SQL / NOSQL / ORM ) 💾
 
 <p align="left">
-<a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/databases"><img src="https://img.shields.io/badge/MongoDB-green?style=for-the-badge&color=00796B" /></a>&nbsp;
-<a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/databases"><img src="https://img.shields.io/badge/MYSQL-dark?style=for-the-badge&color=fff" /></a>&nbsp;
-  <a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/cloud"><img src="https://img.shields.io/badge/Postgresql-orange?style=for-the-badge&color=283593" /></a>&nbsp;
-<a target="_blank" href="https://github.com/yurijserrano/LANGUAGES-TOOLS-LOGOS/tree/master/databases"><img src="https://img.shields.io/badge/PRISMA-green?style=for-the-badge&color=2196F3" /></a>&nbsp;
+<a target="_blank" href="https://www.mongodb.com/"><img src="https://img.shields.io/badge/MongoDB-green?style=for-the-badge&color=00796B" /></a>&nbsp;
+<a target="_blank" href="https://www.mysql.com/"><img src="https://img.shields.io/badge/MYSQL-dark?style=for-the-badge&color=fff" /></a>&nbsp;
+  <a target="_blank" href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/Postgresql-orange?style=for-the-badge&color=283593" /></a>&nbsp;
+<a target="_blank" href="https://www.prisma.io/"><img src="https://img.shields.io/badge/PRISMA-green?style=for-the-badge&color=2196F3" /></a>&nbsp;
 </p>
 
 ### Architecture 🛠

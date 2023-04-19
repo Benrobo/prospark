@@ -1,21 +1,20 @@
 import { SCRIPT_TITLE } from "../config/index.js";
 import figlet from "figlet";
 import useGradinent from "./useGradient.js";
+import chalk from "chalk";
 
+function renderTitle() {
+  const figletConfig: any = {
+    font: "big",
+    horizontalLayout: "default",
+    verticalLayout: "default",
+    width: 80,
+    whitespaceBreak: true,
+  };
 
-function renderTitle(){
-
-    const figletConfig : any = {
-        font: 'big',
-        horizontalLayout: 'default',
-        verticalLayout: 'default',
-        width: 80,
-        whitespaceBreak: true
-    };
-
-    useGradinent({
-        title: figlet.textSync(SCRIPT_TITLE, figletConfig)
-    })
+  useGradinent({
+    title: figlet.textSync(SCRIPT_TITLE, figletConfig),
+  });
 }
 
-export default renderTitle
+export default renderTitle;
