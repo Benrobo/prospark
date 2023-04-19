@@ -1,37 +1,7 @@
-/**
- * 
- * {
-  "name": "paycode",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "test": "",
-    "start": "cd packages/api && node ./dist/server.js",
-    "app": "yarn workspace paycode run start",
-    "api": "yarn workspace api run dev",
-    "build": "yarn workspaces run build",
-    "watch": "yarn workspaces run watch"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
-}
-
- */
-
 import fs from "fs-extra";
 import logger from "../util/logger.js";
 import { createFile, createFolder, updateFileContent } from "./file-manager.js";
 import sleep from "../util/sleep.js";
-
-// TODO: create .gitignore file and include all ignore files and folders
-// TODO: create package.json file
-// TODO: create README.md file and include all instructions.
 
 const gitIgnoreContent = `
 /node_modules
@@ -41,8 +11,7 @@ const gitIgnoreContent = `
 /packages/**/node_modules
 `;
 
-const pkgJsonContent = `
-{
+const pkgJsonContent = `{
     "name": "prospark-project",
     "version": "1.0.0",
     "description": "",

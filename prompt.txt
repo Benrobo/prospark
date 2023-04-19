@@ -30,7 +30,6 @@ This are the following prompt user would be asked.
         - Styling
             - css module (vanilla, nextjs, react, vue)
             - tailwindcss (vanilla, nextjs, react, vue)
-            - styled-component (nextjs, react)
 
     - backend
         - Rest
