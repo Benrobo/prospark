@@ -560,13 +560,6 @@ class ProjectBaseSetup {
     let envContent = "";
 
     if (!shouldUseDB) {
-      removeFile(mainDir + `/src/config`, `mongodb.${fileExt}`);
-      removeFile(mainDir + `/src/config`, `prisma.${fileExt}`);
-
-      // * create .env file
-      envContent = ENV_CONTENT_CONT.replace("{{DB_URL}}", "");
-      createFile(dest_path, ".env", envContent);
-
       // handle nextjs
       if (backendFramework === "nextjs") {
         removeFile(mainDir + `/pages/api/config`, `mongodb.${fileExt}`);
@@ -576,7 +569,15 @@ class ProjectBaseSetup {
         envContent = ENV_CONTENT_CONT.replace("{{DB_URL}}", "");
         createFile(dest_path, ".env", envContent);
         createFile(dest_path, ".env.local", envContent);
+        return;
       }
+
+      removeFile(mainDir + `/src/config`, `mongodb.${fileExt}`);
+      removeFile(mainDir + `/src/config`, `prisma.${fileExt}`);
+
+      // * create .env file
+      envContent = ENV_CONTENT_CONT.replace("{{DB_URL}}", "");
+      createFile(dest_path, ".env", envContent);
     }
 
     if (shouldUseDB) {
