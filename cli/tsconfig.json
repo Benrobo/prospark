@@ -1,8 +1,11 @@
 {
-  "exclude": [
-    "node_modules"
+  "exclude": ["node_modules"],
+  "include": [
+    "src",
+    "lib",
+    "./templates/client/js_support/**/*",
+    "./templates/client/ts_support/**/*"
   ],
-  "include": ["src", "lib"],
   "compilerOptions": {
     /* LANGUAGE COMPILATION OPTIONS */
     "target": "ES2020",
@@ -49,7 +52,7 @@
     "baseUrl": "./src",
     "rootDir": "./src",
     "paths": {
-      "*":["./src/*"]
+      "*": ["./src/*"]
     }
   }
 }

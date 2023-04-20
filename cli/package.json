@@ -9,7 +9,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "script": "node ./dist/index.js",
-    "start": "npm run clean && npm run build && node ./dist/index.js"
+    "start": "npm run clean && npm run build && node ./dist/index.js",
+    "build:templates": "ts-node build/index.ts"
   },
   "keywords": [
     "prospark",
@@ -42,6 +43,7 @@
     "@types/inquirer": "^9.0.2",
     "@types/node": "^18.8.0",
     "@types/rimraf": "^3.0.2",
+    "copy": "^0.3.2",
     "prettier": "^2.8.0",
     "prettier-plugin-tailwindcss": "^0.2.0",
     "rimraf": "^3.0.2",

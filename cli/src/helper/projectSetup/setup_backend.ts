@@ -123,8 +123,10 @@ class SetupBackend extends ProjectBaseSetup {
       const DBType =
         typeof backendDatabaseType !== "undefined" ? backendDatabaseType : null;
 
+      console.log("before");
       await copyDirectoryToDestination(from, to);
-
+      console.log("after");
+      return;
       const pkgJsonData = (await this.configureNodeExpPkgJson(
         newPkgJsonPath,
         projectName,
