@@ -13,7 +13,7 @@ function renderTitle() {
   };
 
   useGradinent({
-    title: figlet.textSync(SCRIPT_TITLE, figletConfig),
+    title: figlet.textSync("Prospark", figletConfig),
   });
 }
 
