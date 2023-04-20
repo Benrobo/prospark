@@ -1,7 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 
-export const SCRIPT_TITLE = "ProSpark";
+export const SCRIPT_TITLE = "create-prospark-app";
 
 // client and server templates
 const tempDir = path.join(
