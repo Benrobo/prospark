@@ -32,6 +32,15 @@ The following commands are available in create-prospark-app:
 
 To run a command, simply add it to the end of the create-prospark-app command. For example:
 
+### Start the app ⏭.
+
+Once generated, if the project generated includes any the following (react, nextjs, nodejs / express, svelte) run the following command in root directory of the project:
+
+```bash
+# this would initialize the workspace apps
+yarn app
+```
+
 ### Supported Tech Stacks. 👨‍🔧
 
 `create-prospark-app` supports the following types of stacks, frameworks below:
