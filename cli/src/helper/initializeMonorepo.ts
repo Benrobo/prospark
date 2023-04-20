@@ -51,6 +51,7 @@ export default class InitializeMonorepo {
         return "";
       }
 
+      const sanitizedProjName = projectName.replace(/\s/g, "").toLowerCase();
       const PATH = dest_path;
       const workspaceFolderName = "packages";
       const projType = stack === "backend" ? "api" : "app";
@@ -58,7 +59,7 @@ export default class InitializeMonorepo {
       // add contents to this files.
       const updatedPkgjsonCont = pkgJsonContent
         .replace(/{{proj_type}}/g, projType)
-        .replace(/{{proj_name}}/g, projectName);
+        .replace(/{{proj_name}}/g, sanitizedProjName);
 
       createFolder(workspaceFolderName, PATH);
       createFile(PATH, ".gitignore", gitIgnoreContent);
