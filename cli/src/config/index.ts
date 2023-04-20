@@ -11,5 +11,3 @@ const tempDir = path.join(
 );
 export const CLIENT_TEMPLATE_DIR = `${tempDir}/client`;
 export const SERVER_TEMPLATE_DIR = `${tempDir}/server`;
-
-console.log(tempDir);
