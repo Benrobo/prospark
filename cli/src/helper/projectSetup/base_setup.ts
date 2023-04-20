@@ -155,7 +155,10 @@ class ProjectBaseSetup {
     try {
       const pkgJsonData = getPackageJsonDataFromPath(path) as ReturnPackageJson;
 
-      pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
+      pkgJsonData["name"] =
+        projectName === "."
+          ? SCRIPT_TITLE
+          : projectName.replace(/\s/g, "").toLowerCase();
       pkgJsonData["description"] = this.scaffoldDesc;
 
       loader.start("updating package.json...");
@@ -192,7 +195,10 @@ class ProjectBaseSetup {
     try {
       const pkgJsonData = getPackageJsonDataFromPath(path) as ReturnPackageJson;
 
-      pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
+      pkgJsonData["name"] =
+        projectName === "."
+          ? SCRIPT_TITLE
+          : projectName.replace(/\s/g, "").toLowerCase();
       pkgJsonData["description"] = this.scaffoldDesc;
 
       loader.start("updating package.json...");
@@ -230,7 +236,10 @@ class ProjectBaseSetup {
     try {
       const pkgJsonData = getPackageJsonDataFromPath(path) as ReturnPackageJson;
 
-      pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
+      pkgJsonData["name"] =
+        projectName === "."
+          ? SCRIPT_TITLE
+          : projectName.replace(/\s/g, "").toLowerCase();
       pkgJsonData["description"] = this.scaffoldDesc;
 
       loader.start("updating package.json...");
@@ -294,7 +303,10 @@ class ProjectBaseSetup {
         delete pkgJsonData.dependencies["prisma"];
       }
 
-      pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
+      pkgJsonData["name"] =
+        projectName === "."
+          ? SCRIPT_TITLE
+          : projectName.replace(/\s/g, "").toLowerCase();
       pkgJsonData["description"] = this.scaffoldDesc;
 
       loader.start("updating package.json...");

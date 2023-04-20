@@ -290,7 +290,13 @@ class SetupFrontend extends ProjectBaseSetup {
       let pkgJsonData = getPackageJsonDataFromPath(
         to + "/package.json"
       ) as ReturnPackageJson;
-      pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
+      pkgJsonData["name"] = pkgJsonData["name"] =
+        projectName === "."
+          ? SCRIPT_TITLE
+          : (pkgJsonData["name"] =
+              projectName === "."
+                ? SCRIPT_TITLE
+                : projectName.replace(/\s/g, "").toLowerCase());
       pkgJsonData["description"] = this.scaffoldDesc;
 
       // update index.html file in 'vanilla' client template
@@ -398,7 +404,13 @@ class SetupFrontend extends ProjectBaseSetup {
       let pkgJsonData = getPackageJsonDataFromPath(
         to + "/package.json"
       ) as ReturnPackageJson;
-      pkgJsonData["name"] = projectName === "." ? SCRIPT_TITLE : projectName;
+      pkgJsonData["name"] = pkgJsonData["name"] =
+        projectName === "."
+          ? SCRIPT_TITLE
+          : (pkgJsonData["name"] =
+              projectName === "."
+                ? SCRIPT_TITLE
+                : projectName.replace(/\s/g, "").toLowerCase());
       pkgJsonData["description"] = this.scaffoldDesc;
 
       // update index.html file in 'vanilla' client template
