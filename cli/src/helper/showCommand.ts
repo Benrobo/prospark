@@ -1,11 +1,10 @@
 import { program } from "commander";
-import getPackageJsonData from "./getPackageJson.js";
 import useGradinent from "../util/useGradient.js";
 
 function showCliCommands() {
-  const pkgData = getPackageJsonData();
-  const name = pkgData["name"] || "prospark";
-  const description = pkgData["description"] || "";
+  const name = "create-prospark-app";
+  const description =
+    "Easily scaffold a new project with prefered technologies.";
 
   const cliCmds = `
     
