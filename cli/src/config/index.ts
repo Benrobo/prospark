@@ -1,6 +1,15 @@
+import path from "path";
+import { fileURLToPath } from "url";
 
-export const SCRIPT_TITLE = "ProSpark"
+export const SCRIPT_TITLE = "ProSpark";
 
 // client and server templates
-export const CLIENT_TEMPLATE_DIR = `src/templates/client`
-export const SERVER_TEMPLATE_DIR = `src/templates/server`
+const tempDir = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "templates"
+);
+export const CLIENT_TEMPLATE_DIR = `${tempDir}/client`;
+export const SERVER_TEMPLATE_DIR = `${tempDir}/server`;
+
+console.log(tempDir);

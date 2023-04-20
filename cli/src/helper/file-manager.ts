@@ -1,7 +1,6 @@
 import fs from "fs-extra";
 import logger from "../util/logger.js";
 import inquirer from "inquirer";
-import rimraf from "rimraf";
 import sleep from "../util/sleep.js";
 import showLoading from "../util/loader.js";
 import chalk from "chalk";
@@ -23,12 +22,11 @@ export function emptyDirectory(path: string, cb?: Function) {
     fs.removeSync(`${path}/node_modules`);
   }
 
-  rimraf(path, async (err) => {
+  fs.remove(path, (err) => {
     if (err) {
       logger.error(err.message);
       return;
     }
-
     cb && cb();
   });
 }
@@ -94,7 +92,7 @@ export async function createFolder(folderName: string, dest_path: string) {
       logger.error(
         `failed to create folder, dest_path (${dest_path}) path doesn't exists.`
       );
-      return;
+      return true;
     }
     if (fs.existsSync(fullPath)) {
       if (!isDirectoryEmptySync(fullPath)) {
@@ -143,27 +141,6 @@ export async function copyDirectoryToDestination(from: string, to: string) {
       return;
     }
 
-    // check if the directory is empty.
-    // if(!isDirectoryEmptySync(to)){
-    //     // ask the user if he would like to empty the content inside
-    //     const ans = await inquirer.prompt([{
-    //         type: 'confirm',
-    //         name: 'wouldClear',
-    //         message: 'Empty directory 2 (y/n):'
-    //     }])
-
-    //     if(ans.wouldClear){
-    //         emptyDirectory(to);
-
-    //         await sleep(1)
-    //         !fs.existsSync(to) && fs.mkdirSync(to);
-    //         copyNestedDirectoriesSync(from, to);
-    //         return true;
-    //     }
-    //     (await showLoading()).stop(null, `failed: ${to} isn't empty `)
-    //     return false;
-    // }
-
     LOADING.start("setting template");
     copyNestedDirectoriesSync(from, to);
     await sleep(2);
@@ -203,11 +180,12 @@ export function readFileData(path_to_file: string) {
       logger.error(
         `failed to read file, path_to_file (${path_to_file}) path doesn't exists.`
       );
-      return;
+      return "";
     }
     const data = fs.readFileSync(path_to_file);
     return data.toString();
   } catch (e: any) {
     logger.error(`failed to read file: ${e.message}`);
+    return "";
   }
 }

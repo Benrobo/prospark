@@ -100,7 +100,7 @@ class SetupBackend extends ProjectBaseSetup {
       variant.toLowerCase() === Variant.JS
         ? `/js_support/node_exp/`
         : `/ts_support/node_exp/`;
-    const nodeExpDir = path.join("./", SERVER_TEMPLATE_DIR, templatePath);
+    const nodeExpDir = path.join(SERVER_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
 
@@ -123,10 +123,8 @@ class SetupBackend extends ProjectBaseSetup {
       const DBType =
         typeof backendDatabaseType !== "undefined" ? backendDatabaseType : null;
 
-      console.log("before");
       await copyDirectoryToDestination(from, to);
-      console.log("after");
-      return;
+
       const pkgJsonData = (await this.configureNodeExpPkgJson(
         newPkgJsonPath,
         projectName,
@@ -160,7 +158,7 @@ class SetupBackend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       this.showWelcomeMessage(
@@ -184,9 +182,9 @@ class SetupBackend extends ProjectBaseSetup {
     } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
-        ? `/js_support/nextjs/`
-        : `/ts_support/nextjs/`;
-    const nextjsDir = path.join("./", SERVER_TEMPLATE_DIR, templatePath);
+        ? `js_support/nextjs/`
+        : `ts_support/nextjs/`;
+    const nextjsDir = path.join(SERVER_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
 
@@ -244,7 +242,7 @@ class SetupBackend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       this.showWelcomeMessage(

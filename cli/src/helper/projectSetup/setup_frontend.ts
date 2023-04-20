@@ -219,21 +219,29 @@ class SetupFrontend extends ProjectBaseSetup {
       `${frontendFramework.toLowerCase()}-${frontendStyling.toLowerCase()}`
     ) {
       case "vanilla-tailwindcss":
-        return this.isVanillaAndTailwind(promptInput);
+        this.isVanillaAndTailwind(promptInput);
+        break;
       case "vanilla-css module":
-        return this.isVanillaAndCssModule(promptInput);
+        this.isVanillaAndCssModule(promptInput);
+        break;
       case "react-tailwindcss":
-        return this.isReactAndTailwind(promptInput);
+        this.isReactAndTailwind(promptInput);
+        break;
       case "react-css module":
-        return this.isReactAndCssModule(promptInput);
+        this.isReactAndCssModule(promptInput);
+        break;
       case "svelte-tailwindcss":
-        return this.isSvelteAndTailwindCss(promptInput);
+        this.isSvelteAndTailwindCss(promptInput);
+        break;
       case "svelte-css module":
-        return this.isSvelteAndCssModule(promptInput);
+        this.isSvelteAndCssModule(promptInput);
+        break;
       case "nextjs-tailwindcss":
-        return this.isNextjsAndTailwindcss(promptInput);
+        this.isNextjsAndTailwindcss(promptInput);
+        break;
       case "nextjs-css module":
-        return this.isNextjsAndCssModule(promptInput);
+        this.isNextjsAndCssModule(promptInput);
+        break;
       default:
       // code to handle other cases or an error
     }
@@ -261,7 +269,8 @@ class SetupFrontend extends ProjectBaseSetup {
       variant.toLowerCase() === Variant.JS
         ? `/js_support/vanilla`
         : `/ts_support/vanilla`;
-    const vanillaDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
+    const vanillaDir = path.join(CLIENT_TEMPLATE_DIR, templatePath);
+
     const cleanProjectName = cleanUpProjectName(projectName);
 
     const dest_path = getCwd();
@@ -291,18 +300,12 @@ class SetupFrontend extends ProjectBaseSetup {
           : path.join(to, `/index.html`);
       const scriptPath =
         variant.toLowerCase() === "typescript" ? "./src/main.ts" : "./main.js";
+
       const newHtmlData = VANILLA_HTML_CONTENT.replace(
         "{{projectName}}",
         projectName
       )
-        .replace(
-          "{{script_logic}}",
-          `${
-            projectType.toLowerCase() === "blank"
-              ? "Blank Project"
-              : "Starter Project"
-          }`
-        )
+        .replace("{{script_logic}}", `Starter Project`)
         .replace(
           "{{styling_logic}}",
           `<script src="https://cdn.tailwindcss.com" defer></script>`
@@ -347,7 +350,7 @@ class SetupFrontend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       // show welcome message
@@ -370,23 +373,14 @@ class SetupFrontend extends ProjectBaseSetup {
   }
 
   protected async isVanillaAndCssModule(promptInput: ProjectOptions) {
-    const {
-      projectName,
-      projectType,
-      architecture,
-      stack,
-      variant,
-      frontendFramework,
-      frontendStyling,
-    } = promptInput;
+    const { projectName, variant } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
         ? `/js_support/vanilla`
         : `/ts_support/vanilla`;
-    const vanillaDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
+    const vanillaDir = path.join(CLIENT_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
 
-    // create project directory from project name
     const dest_path = getCwd();
 
     if (cleanProjectName !== ".") {
@@ -422,14 +416,7 @@ class SetupFrontend extends ProjectBaseSetup {
         "{{projectName}}",
         projectName
       )
-        .replace(
-          "{{script_logic}}",
-          `${
-            projectType.toLowerCase() === "blank"
-              ? "Blank Project"
-              : "Starter Project"
-          }`
-        )
+        .replace("{{script_logic}}", `"Starter Project"`)
         .replace(
           "{{styling_logic}}",
           `<link rel="stylesheet" href="${stylePath}" />`
@@ -479,7 +466,7 @@ class SetupFrontend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       // show welcome message
@@ -502,20 +489,12 @@ class SetupFrontend extends ProjectBaseSetup {
   }
 
   protected async isReactAndTailwind(promptInput: ProjectOptions) {
-    const {
-      projectName,
-      projectType,
-      architecture,
-      stack,
-      variant,
-      frontendFramework,
-      frontendStyling,
-    } = promptInput;
+    const { projectName, stack, variant, frontendStyling } = promptInput;
     const templatePath =
       variant.toLowerCase() === Variant.JS
         ? `/js_support/react/`
         : `/ts_support/react/`;
-    const reactDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
+    const reactDir = path.join(CLIENT_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
 
@@ -565,7 +544,7 @@ class SetupFrontend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       this.showWelcomeMessage(
@@ -585,7 +564,7 @@ class SetupFrontend extends ProjectBaseSetup {
       variant.toLowerCase() === Variant.JS
         ? `/js_support/react/`
         : `/ts_support/react/`;
-    const reactDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
+    const reactDir = path.join(CLIENT_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
 
@@ -633,7 +612,7 @@ class SetupFrontend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       this.showWelcomeMessage(
@@ -653,7 +632,7 @@ class SetupFrontend extends ProjectBaseSetup {
       variant.toLowerCase() === Variant.JS
         ? `/js_support/svelte/`
         : `/ts_support/svelte/`;
-    const reactDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
+    const reactDir = path.join(CLIENT_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
 
@@ -703,7 +682,7 @@ class SetupFrontend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       this.showWelcomeMessage(
@@ -723,7 +702,7 @@ class SetupFrontend extends ProjectBaseSetup {
       variant.toLowerCase() === Variant.JS
         ? `/js_support/svelte/`
         : `/ts_support/svelte/`;
-    const reactDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
+    const reactDir = path.join(CLIENT_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
 
@@ -771,7 +750,7 @@ class SetupFrontend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       this.showWelcomeMessage(
@@ -791,7 +770,7 @@ class SetupFrontend extends ProjectBaseSetup {
       variant.toLowerCase() === Variant.JS
         ? `/js_support/nextjs/`
         : `/ts_support/nextjs/`;
-    const reactDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
+    const reactDir = path.join(CLIENT_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
 
@@ -841,7 +820,7 @@ class SetupFrontend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       this.showWelcomeMessage(
@@ -860,7 +839,7 @@ class SetupFrontend extends ProjectBaseSetup {
       variant.toLowerCase() === Variant.JS
         ? `/js_support/nextjs/`
         : `/ts_support/nextjs/`;
-    const reactDir = path.join("./", CLIENT_TEMPLATE_DIR, templatePath);
+    const reactDir = path.join(CLIENT_TEMPLATE_DIR, templatePath);
     const cleanProjectName = cleanUpProjectName(projectName);
     const dest_path = getCwd();
 
@@ -908,7 +887,7 @@ class SetupFrontend extends ProjectBaseSetup {
       const shouldInitializeGit = await this.askForGitInit();
 
       if (shouldInitializeGit) {
-        await initializeGit(to);
+        await initializeGit(`${getCwd()}/${cleanProjectName}`);
       }
 
       this.showWelcomeMessage(

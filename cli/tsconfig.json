@@ -1,11 +1,6 @@
 {
-  "exclude": ["node_modules"],
-  "include": [
-    "src",
-    "lib",
-    "./templates/client/js_support/**/*",
-    "./templates/client/ts_support/**/*"
-  ],
+  "exclude": ["node_modules", "templates/**/*"],
+  "include": ["src", "lib"],
   "compilerOptions": {
     /* LANGUAGE COMPILATION OPTIONS */
     "target": "ES2020",
@@ -16,14 +11,14 @@
 
     /* EMIT RULES */
     "outDir": "./dist",
-    "noEmit": false, // TSUP takes care of emitting js for us, in a MUCH faster way
+    "noEmit": false,
     "declaration": false,
     "declarationMap": false,
     "sourceMap": false,
     "removeComments": true,
 
     /* TYPE CHECKING RULES */
-    "strict": true,
+    "strict": false,
     // "noImplicitAny": true, // Included in "Strict"
     // "noImplicitThis": true, // Included in "Strict"
     // "strictBindCallApply": true, // Included in "Strict"
