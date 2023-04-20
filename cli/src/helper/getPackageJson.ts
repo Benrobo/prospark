@@ -24,8 +24,7 @@ export interface ReturnPackageJson {
 }
 
 function getPackageJsonData(): ReturnPackageJson {
-  const cwd = path.join("..", "package.json");
-  console.log({ cwd });
+  const cwd = getCwd();
   const packageJson = path.join(cwd, "package.json");
   const packageJsonData = fs.readJsonSync(packageJson);
   return packageJsonData;
